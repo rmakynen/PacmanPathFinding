@@ -20,3 +20,23 @@ python pacman.py -l testSearch -p AStarFoodSearchAgent
 python pacman.py -l trickySearch -p AStarFoodSearchAgent
 python pacman.py -l bigSearch -p ClosestDotSearchAgent -z .5 
 python pacman.py -l bigSearch -p ApproximateSearchAgent -z .5 -q 
+
+
+#DFS - Depth first
+python pacman.py -l mediumMaze -p SearchAgent -a fn=dfs
+python pacman.py -l tinyMaze -p SearchAgent -a fn=dfs
+python pacman.py -l bigMaze -p SearchAgent -a fn=dfs
+
+#BFS - Bredth first
+python pacman.py -l mediumMaze -p SearchAgent -a fn=bfs
+python pacman.py -l tinyMaze -p SearchAgent -a fn=bfs
+python pacman.py -l bigMaze -p SearchAgent -a fn=bfs
+
+#UCS - Uniform Cost
+python pacman.py -l mediumMaze -p SearchAgent -a fn=ucs
+python pacman.py -l tinyMaze -p SearchAgent -a fn=ucs
+python pacman.py -l bigMaze -p SearchAgent -a fn=ucs
+
+#A*
+python pacman.py -l testSearch -p AStarFoodSearchAgent
+python pacman.py -l trickySearch -p AStarFoodSearchAgent

@@ -87,7 +87,30 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+	
+    print("CODE START - depthFirstSearch")
+    start=problem.getStartState() # get the starting position.
+    state = start
+    
+    succ=problem.getSuccessors(state) # get successors of state  state.
+    stack=util.Stack()# Define a   Stack structure stack.
+    queue=util.Queue()# Define a    Queue queue. 
+    Pqueue=util.PriorityQueue ()# Define a    PriorityQueue Pqueue. 
+    util.Stack.push(stack, state)# push  the state state into the Stack (satck) or Queue (queue)
+    util.Queue.push(queue, state)# push  the state state into the Stack (satck) or Queue (queue)
+    state=util.Stack.pop(stack)# pop  the  last element from a stack stack
+    state=util.Queue.pop(queue)#  pop the last element from the Queue  queue.
+    problem.isGoalState(state)# check if the state  state is a final state
+
+
+    print("CODE END - depthFirstSearch")
+	
+    from game import Directions
+    s = Directions.SOUTH
+    w = Directions.WEST
+    return  [s, s, w, s, w, w, s, w]
+	
+    #util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
