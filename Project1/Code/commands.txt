@@ -23,18 +23,25 @@ python pacman.py -l bigSearch -p ApproximateSearchAgent -z .5 -q
 
 
 #DFS - Depth first
+
+#We dont know food locations
 python pacman.py -l mediumMaze -p SearchAgent -a fn=dfs
-python pacman.py -l tinyMaze -p SearchAgent -a fn=dfs
 python pacman.py -l bigMaze -p SearchAgent -a fn=dfs
+
+#We know food locations
+
+
+python pacman.py -l mediumMaze -p FoodSearchProblem 
+python pacman.py -l bigMaze -p FoodSearchProblem 
+
+
 
 #BFS - Bredth first
 python pacman.py -l mediumMaze -p SearchAgent -a fn=bfs
-python pacman.py -l tinyMaze -p SearchAgent -a fn=bfs
 python pacman.py -l bigMaze -p SearchAgent -a fn=bfs
 
 #UCS - Uniform Cost
 python pacman.py -l mediumMaze -p SearchAgent -a fn=ucs
-python pacman.py -l tinyMaze -p SearchAgent -a fn=ucs
 python pacman.py -l bigMaze -p SearchAgent -a fn=ucs
 
 #A*

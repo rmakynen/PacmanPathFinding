@@ -88,29 +88,95 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 	
+    '''
+        Task 1:
+        python pacman.py -l tinyMaze -p SearchAgent         #NOTE CURRRENTLY NOT IMPLEMENTED
+        python pacman.py -l mediumMaze -p SearchAgent
+        python pacman.py -l bigMaze -z .5 -p SearchAgent 
+    '''
+
     print("CODE START - depthFirstSearch")
-    start=problem.getStartState() # get the starting position.
-    state = start
+    state=problem.getStartState() # get the starting position.
+    is_goal = False
+    def getTotalTraversed(aState):
+        return(aState[0])
+    def getXY(aState):
+        return(aState[1][0])
+    def getDirection(aState):
+        return(aState[1][1])
+    def getDepth(aState):
+        return(aState[1][2])
+
+    explored_list = []
+    explored_list.append(state) #Append (x,y) to the list of explored coordinates
+    print("Start location: "+str(state))
     
-    succ=problem.getSuccessors(state) # get successors of state  state.
+    from util import Stack
+    stack=Stack()
+
+
+    
+    # while False == is_goal:
+
+    
+    successors=problem.getSuccessors(state) # get successors of state  state.
+    print("List of choices:")
+    for aState in enumerate(successors):
+        is_goal = problem.isGoalState(aState)
+        xy = getXY(aState)
+        print("--------------------------------------------------------------------------")
+        print("Total traversed dist??: " +str(getTotalTraversed(aState))) #Alternative:  aState[0]
+        print("New XY:               " +str(xy))                      #Alternative:  aState[1][0]
+        print("Direction:            " +str(getDirection(aState)))    #Alternative:  aState[1][1]
+        print("Depth:                " +str(getDepth(aState)))        #Alternative:  aState[1][2]
+        print("IS goal:              " +str(is_goal))
+        
+        
+        #NOTE: IF the state is not the GOAL AND there are no more new nodes to be explored. Then pop the node and move to the next node.
+        
+        if xy not in explored_list:
+            print("Adding new location!")
+            explored_list.append(xy)
+            stack.push(aState)
+        else:
+            print("Don't add location. Already explored.")
+            
+    while False == stack.isEmpty():
+        state=stack.pop()
+        print("Popped: "+ str(state))
+            
+            
+    print("--------------------------------------------------------------------------")
+    # areasExplored = getAndResetExplored()
+    # print(areasExplored)
+    # print("--------------------------------------------------------------------------")
+    
+
+    # print(start)
+    # print(succ)
+    '''
+    #STACK
     stack=util.Stack()# Define a   Stack structure stack.
+    util.Stack.push(stack, state)# push  the state state into the Stack (satck) or Queue (queue)
+    state=util.Stack.pop(stack)# pop  the  last element from a stack stack
+    #Queue
     queue=util.Queue()# Define a    Queue queue. 
     Pqueue=util.PriorityQueue ()# Define a    PriorityQueue Pqueue. 
-    util.Stack.push(stack, state)# push  the state state into the Stack (satck) or Queue (queue)
     util.Queue.push(queue, state)# push  the state state into the Stack (satck) or Queue (queue)
-    state=util.Stack.pop(stack)# pop  the  last element from a stack stack
     state=util.Queue.pop(queue)#  pop the last element from the Queue  queue.
+    #STATE
     problem.isGoalState(state)# check if the state  state is a final state
-
+    '''
 
     print("CODE END - depthFirstSearch")
-	
     from game import Directions
+    n = Directions.NORTH
+    e = Directions.EAST
     s = Directions.SOUTH
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 	
-    #util.raiseNotDefined()
+    util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
