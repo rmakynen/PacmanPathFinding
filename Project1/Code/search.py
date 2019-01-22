@@ -108,52 +108,60 @@ def depthFirstSearch(problem):
         return(aState[1][2])
 
     explored_list = []
-    explored_list.append(state) #Append (x,y) to the list of explored coordinates
+    #explored_list.append(state) #Append (x,y) to the list of explored coordinates
     print("Start location: "+str(state))
     
     from util import Stack
     stack=Stack()
 
-
-    
-    # while False == is_goal:
-
-    
-    successors=problem.getSuccessors(state) # get successors of state  state.
-    print("List of choices:")
-    for aState in enumerate(successors):
-        is_goal = problem.isGoalState(aState)
-        xy = getXY(aState)
-        print("--------------------------------------------------------------------------")
-        print("Index:        " +str(getIndex(aState))) #Alternative:  aState[0]
-        print("New XY:       " +str(xy))                      #Alternative:  aState[1][0]
-        print("Direction:    " +str(getDirection(aState)))    #Alternative:  aState[1][1]
-        print("Step Cost:    " +str(getStepCost(aState)))        #Alternative:  aState[1][2]
-        print("IS goal:      " +str(is_goal))
-        
-        
-        #NOTE: IF the state is not the GOAL AND there are no more new nodes to be explored. Then pop the node and move to the next node.
-        
+    times=0
+    xy = state
+    import sys
+    explored_list=[]
+    first_run=True
+    stack=util.Stack()# Define a   Stack structure stack.
+    route = []
+    real_route=[]
+    xy = state
+    while False == is_goal:
         if xy not in explored_list:
-            print("Adding new location!")
+            successors=problem.getSuccessors(xy) # get successors of state
             explored_list.append(xy)
-            stack.push(aState)
+            for aSuccessor in successors:
+                util.Stack.push(stack, aSuccessor)# push  the state state into the Stack (stack) or Queue (queue)
+                is_goal = problem.isGoalState(aSuccessor[0])
+                if is_goal:
+                    #print("GOOOAL")
+                    break 
+        if not stack.isEmpty():
+            aSucc = util.Stack.pop(stack)
+            xy = aSucc[0]
+            if xy not in explored_list:
+                route.append(aSucc)
+    print("route------------")
+    real_route=[]
+    prev = None
+    for i,aThing in reversed(list(enumerate(route))):
+        print("--------------------------------------------")
+        if i==len(route)-1:
+            print("PREV: "+str(aThing))
+            print("PREV_dir: "+str(aThing[1]))
+            prev = aThing
+            real_route.append(aThing[1])
         else:
-            print("Don't add location. Already explored.")
-            
-    while False == stack.isEmpty():
-        state=stack.pop()
-        print("Popped: "+ str(state))
-            
-            
-    print("--------------------------------------------------------------------------")
-    # areasExplored = getAndResetExplored()
-    # print(areasExplored)
-    # print("--------------------------------------------------------------------------")
+            dist = util.manhattanDistance( prev[0], aThing[0] )
+            print("distance: "+str(dist))
+            if dist == 1:
+                real_route.append(aThing[1])
+                prev = aThing
+  
+    real_route.reverse()
+    print("real route: ")
+    print(real_route)
+    print("---------")
     
-
-    # print(start)
-    # print(succ)
+    return(real_route)    
+    
     '''
     #STACK
     stack=util.Stack()# Define a   Stack structure stack.
@@ -169,11 +177,6 @@ def depthFirstSearch(problem):
     '''
 
     print("CODE END - depthFirstSearch")
-    from game import Directions
-    n = Directions.NORTH
-    e = Directions.EAST
-    s = Directions.SOUTH
-    w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 	
     util.raiseNotDefined()
