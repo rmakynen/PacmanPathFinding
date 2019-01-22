@@ -98,13 +98,13 @@ def depthFirstSearch(problem):
     print("CODE START - depthFirstSearch")
     state=problem.getStartState() # get the starting position.
     is_goal = False
-    def getTotalTraversed(aState):
+    def getIndex(aState):
         return(aState[0])
     def getXY(aState):
         return(aState[1][0])
     def getDirection(aState):
         return(aState[1][1])
-    def getDepth(aState):
+    def getStepCost(aState):
         return(aState[1][2])
 
     explored_list = []
@@ -125,11 +125,11 @@ def depthFirstSearch(problem):
         is_goal = problem.isGoalState(aState)
         xy = getXY(aState)
         print("--------------------------------------------------------------------------")
-        print("Total traversed dist??: " +str(getTotalTraversed(aState))) #Alternative:  aState[0]
-        print("New XY:               " +str(xy))                      #Alternative:  aState[1][0]
-        print("Direction:            " +str(getDirection(aState)))    #Alternative:  aState[1][1]
-        print("Depth:                " +str(getDepth(aState)))        #Alternative:  aState[1][2]
-        print("IS goal:              " +str(is_goal))
+        print("Index:        " +str(getIndex(aState))) #Alternative:  aState[0]
+        print("New XY:       " +str(xy))                      #Alternative:  aState[1][0]
+        print("Direction:    " +str(getDirection(aState)))    #Alternative:  aState[1][1]
+        print("Step Cost:    " +str(getStepCost(aState)))        #Alternative:  aState[1][2]
+        print("IS goal:      " +str(is_goal))
         
         
         #NOTE: IF the state is not the GOAL AND there are no more new nodes to be explored. Then pop the node and move to the next node.

@@ -24,7 +24,9 @@ python pacman.py -l bigSearch -p ApproximateSearchAgent -z .5 -q
 
 #DFS - Depth first
 
+
 #We dont know food locations
+python pacman.py -l tinymaze -p SearchAgent -a fn=dfs
 python pacman.py -l mediumMaze -p SearchAgent -a fn=dfs
 python pacman.py -l bigMaze -p SearchAgent -a fn=dfs
 
