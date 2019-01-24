@@ -288,7 +288,14 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        self.start = (startingGameState.getPacmanPosition(),startingGameState.getFood())
+        self.markCorners = startingGameState.getFood()
+
+        #If no food in corners mark corners as goals anyway
+        if self.markCorners.count() == 0:
+            for corner in self.corners:
+                self.markCorners[corner[0]][corner[1]] = True
+        
+        self.start = (startingGameState.getPacmanPosition(),self.markCorners)
 
     def getStartState(self):
         """
