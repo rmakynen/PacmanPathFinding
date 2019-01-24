@@ -93,18 +93,18 @@ def depthFirstSearch(problem):
     stack=Stack()
     is_goal = False
     explored_list = []
-
     #Recursive dfs.
     def _dfs(xy):
-        print("------------------------------------------------------------------------")
-        print(xy)
+        #print("------------------------------------------------------------------------")
+        #print(xy)
         is_goal = problem.isGoalState(xy)
         if is_goal:
             return(1)
         elif xy not in explored_list:
             explored_list.append(xy)
             successors =  problem.getSuccessors(xy) # get successors of state
-            for aSuccessor in successors:
+            # for aSuccessor in successors:                                           #Cost for each 3 mazes: 8,246,210
+            for i,aSuccessor in reversed(list(enumerate(successors))):            #Cost for each 3 mazes: 10,130,210   <-- Seems to be better on average. Use this.
                 stack.push(aSuccessor)
                 xy_s = aSuccessor[0]
                 val = _dfs(xy_s)
@@ -115,24 +115,23 @@ def depthFirstSearch(problem):
         else:
             return(None)
         return
-
+    
     xy=problem.getStartState() # get the starting position.
     _dfs(xy)
-
+    
     result=[]           #list of directions that we return
-    print("POP STACK: --------")
+    #print("POP STACK: --------")
     while False == stack.isEmpty():
         poppedVal = stack.pop()
-        print(poppedVal)
+        #print(poppedVal)
         result.append(poppedVal[1])
 
     result.reverse()
-    print("Route: --------")
-    for aRouteDir in result:
-        print(aRouteDir)
+    #print("Route: --------")
+    # for aRouteDir in result:
+        # print(aRouteDir)
 
     return(result)
-
 
 
 
