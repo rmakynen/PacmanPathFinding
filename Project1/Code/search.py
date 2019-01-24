@@ -93,10 +93,8 @@ def depthFirstSearch(problem):
     stack=Stack()
     is_goal = False
     explored_list = []
-    #Recursive dfs.
+    #Recursive dfs:
     def _dfs(xy):
-        #print("------------------------------------------------------------------------")
-        #print(xy)
         is_goal = problem.isGoalState(xy)
         if is_goal:
             return(1)
@@ -108,7 +106,7 @@ def depthFirstSearch(problem):
                 stack.push(aSuccessor)
                 xy_s = aSuccessor[0]
                 val = _dfs(xy_s)
-                if val==None:   #This path didn't take us to the exit. Let's remove it from the "stack" aka path.
+                if val==None:   #This node didn't take us to the exit. Let's remove it from the "stack".
                     stack.pop()
                 else:
                     return(1)   #We found the goal. Let's return(1) to indicate that. Our path is already saved in the "stack" which is a local variable in the scope of "depthFirstSearch" function
@@ -120,121 +118,12 @@ def depthFirstSearch(problem):
     _dfs(xy)
 
     result=[]           #list of directions that we return
-    #print("POP STACK: --------")
     while False == stack.isEmpty():
         poppedVal = stack.pop()
-        #print(poppedVal)
         result.append(poppedVal[1])
 
     result.reverse()
-    #print("Route: --------")
-    # for aRouteDir in result:
-        # print(aRouteDir)
-
     return(result)
-
-
-
-
-
-
-
-
-	# -----------------------------------------------------------------------------
-
-    '''
-        Task 1:
-        python pacman.py -l tinyMaze -p SearchAgent         #NOTE CURRRENTLY NOT IMPLEMENTED
-        python pacman.py -l mediumMaze -p SearchAgent
-        python pacman.py -l bigMaze -z .5 -p SearchAgent
-    '''
-
-    print("CODE START - depthFirstSearch")
-    state=problem.getStartState() # get the starting position.
-    is_goal = False
-    def getIndex(aState):
-        return(aState[0])
-    def getXY(aState):
-        return(aState[1][0])
-    def getDirection(aState):
-        return(aState[1][1])
-    def getStepCost(aState):
-        return(aState[1][2])
-
-    explored_list = []
-    #explored_list.append(state) #Append (x,y) to the list of explored coordinates
-    print("Start location: "+str(state))
-
-    from util import Stack
-    stack=Stack()
-
-    times=0
-    xy = state
-    import sys
-    explored_list=[]
-    first_run=True
-    stack=util.Stack()# Define a   Stack structure stack.
-    route = []
-    real_route=[]
-    xy = state
-    while False == is_goal:
-        if xy not in explored_list:
-            successors=problem.getSuccessors(xy) # get successors of state
-            explored_list.append(xy)
-            for aSuccessor in successors:
-                util.Stack.push(stack, aSuccessor)# push  the state state into the Stack (stack) or Queue (queue)
-                is_goal = problem.isGoalState(aSuccessor[0])
-                if is_goal:
-                    #print("GOOOAL")
-                    break
-        if not stack.isEmpty():
-            aSucc = util.Stack.pop(stack)
-            xy = aSucc[0]
-            if xy not in explored_list:
-                route.append(aSucc)
-    print("route------------")
-    real_route=[]
-    prev = None
-    for i,aThing in reversed(list(enumerate(route))):
-        print("--------------------------------------------")
-        if i==len(route)-1:
-            print("PREV: "+str(aThing))
-            print("PREV_dir: "+str(aThing[1]))
-            prev = aThing
-            real_route.append(aThing[1])
-        else:
-            dist = util.manhattanDistance( prev[0], aThing[0] )
-            print("distance: "+str(dist))
-            if dist == 1:
-                real_route.append(aThing[1])
-                prev = aThing
-
-    real_route.reverse()
-    print("real route: ")
-    print(real_route)
-    print("---------")
-
-    return(real_route)
-
-    '''
-    #STACK
-    stack=util.Stack()# Define a   Stack structure stack.
-    util.Stack.push(stack, state)# push  the state state into the Stack (satck) or Queue (queue)
-    state=util.Stack.pop(stack)# pop  the  last element from a stack stack
-    #Queue
-    queue=util.Queue()# Define a    Queue queue.
-    Pqueue=util.PriorityQueue ()# Define a    PriorityQueue Pqueue.
-    util.Queue.push(queue, state)# push  the state state into the Stack (satck) or Queue (queue)
-    state=util.Queue.pop(queue)#  pop the last element from the Queue  queue.
-    #STATE
-    problem.isGoalState(state)# check if the state  state is a final state
-    '''
-
-    print("CODE END - depthFirstSearch")
-    return  [s, s, w, s, w, w, s, w]
-
-    util.raiseNotDefined()
-
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
@@ -274,9 +163,46 @@ def breadthFirstSearch(problem):
     return path
 
 def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
+    """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue=util.PriorityQueue() #Instantiate the priorityqueue
+    path = [] #Collection of the path from start to finish
+    visited = set() #Collection of the visited nodes
+    startNode = [problem.getStartState(), [], 0] #Starting node of the pacman, this time also add cost (0)
+
+    cost = startNode[2] #+ heuristic(startNode[0], problem) #Set the initial cost
+    util.PriorityQueue.push(queue, startNode, cost) #Add starting node to queue to begin looping from
+
+    is_goal = False #Set goal to false
+
+    #Main loop, run while goal is not found
+    while not is_goal:
+        #Check if PriorityQueue is empty
+        if not util.PriorityQueue.isEmpty(queue):
+            (node, path, cost) = util.PriorityQueue.pop(queue) #Extract node, path and cost from the next node in queue
+
+        #Check if the current node is the goal node, if it is, break out of the loop
+        is_goal = problem.isGoalState(node)
+        if is_goal:
+            break
+
+        #Check if the current node is already visited
+        if node not in visited:
+            visited.add(node) #Add the current node to visited nodes list
+            successors = problem.getSuccessors(node) #Get successors of the current node
+
+            #Iterate through the child nodes of the current node
+            for successor in successors:
+                #Ignore successors that are already visited
+                if successor[0] not in visited:
+                    new_node_path = path + [successor[1]] #Create a new path and add the current succesor's action to it
+                    new_node_cost = cost + successor[2] #Create new cost
+                    new_node = (successor[0], new_node_path, new_node_cost) #Create new node with the path information and cost
+                    heuristic_cost = new_node_cost #+ heuristic(successor[0], problem) #Calculate heuristic cost
+                    util.PriorityQueue.push(queue, new_node, heuristic_cost) #Add the new node with the path information to queue and the heuristic cost
+
+    #Return the guide to the goal (e.g. ["West", "West", "South", ...])
+    return path
 
 def nullHeuristic(state, problem=None):
     """
