@@ -72,6 +72,7 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -87,6 +88,60 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
+    # -----------------------------------------------------------------------------
+    from util import Stack
+    stack=Stack()
+    is_goal = False
+    explored_list = []
+
+    #Recursive dfs.
+    def _dfs(xy):
+        print("------------------------------------------------------------------------")
+        print(xy)
+        is_goal = problem.isGoalState(xy)
+        if is_goal:
+            return(1)
+        elif xy not in explored_list:
+            explored_list.append(xy)
+            successors =  problem.getSuccessors(xy) # get successors of state
+            for aSuccessor in successors:
+                stack.push(aSuccessor)
+                xy_s = aSuccessor[0]
+                val = _dfs(xy_s)
+                if val==None:   #This path didn't take us to the exit. Let's remove it from the "stack" aka path.
+                    stack.pop()
+                else:
+                    return(1)   #We found the goal. Let's return(1) to indicate that. Our path is already saved in the "stack" which is a local variable in the scope of "depthFirstSearch" function
+        else:
+            return(None)
+        return
+    
+    xy=problem.getStartState() # get the starting position.
+    _dfs(xy)
+    
+    result=[]           #list of directions that we return
+    print("POP STACK: --------")
+    while False == stack.isEmpty():
+        poppedVal = stack.pop()
+        print(poppedVal)
+        result.append(poppedVal[1])
+
+    result.reverse()
+    print("Route: --------")
+    for aRouteDir in result:
+        print(aRouteDir)
+
+    return(result)
+
+
+	
+	
+	
+	
+	
+	
+	
+	# -----------------------------------------------------------------------------
 	
     '''
         Task 1:
