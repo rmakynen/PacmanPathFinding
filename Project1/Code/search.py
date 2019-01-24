@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -115,10 +115,10 @@ def depthFirstSearch(problem):
         else:
             return(None)
         return
-    
+
     xy=problem.getStartState() # get the starting position.
     _dfs(xy)
-    
+
     result=[]           #list of directions that we return
     print("POP STACK: --------")
     while False == stack.isEmpty():
@@ -134,20 +134,20 @@ def depthFirstSearch(problem):
     return(result)
 
 
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	# -----------------------------------------------------------------------------
-	
+
     '''
         Task 1:
         python pacman.py -l tinyMaze -p SearchAgent         #NOTE CURRRENTLY NOT IMPLEMENTED
         python pacman.py -l mediumMaze -p SearchAgent
-        python pacman.py -l bigMaze -z .5 -p SearchAgent 
+        python pacman.py -l bigMaze -z .5 -p SearchAgent
     '''
 
     print("CODE START - depthFirstSearch")
@@ -165,7 +165,7 @@ def depthFirstSearch(problem):
     explored_list = []
     #explored_list.append(state) #Append (x,y) to the list of explored coordinates
     print("Start location: "+str(state))
-    
+
     from util import Stack
     stack=Stack()
 
@@ -187,7 +187,7 @@ def depthFirstSearch(problem):
                 is_goal = problem.isGoalState(aSuccessor[0])
                 if is_goal:
                     #print("GOOOAL")
-                    break 
+                    break
         if not stack.isEmpty():
             aSucc = util.Stack.pop(stack)
             xy = aSucc[0]
@@ -209,22 +209,22 @@ def depthFirstSearch(problem):
             if dist == 1:
                 real_route.append(aThing[1])
                 prev = aThing
-  
+
     real_route.reverse()
     print("real route: ")
     print(real_route)
     print("---------")
-    
-    return(real_route)    
-    
+
+    return(real_route)
+
     '''
     #STACK
     stack=util.Stack()# Define a   Stack structure stack.
     util.Stack.push(stack, state)# push  the state state into the Stack (satck) or Queue (queue)
     state=util.Stack.pop(stack)# pop  the  last element from a stack stack
     #Queue
-    queue=util.Queue()# Define a    Queue queue. 
-    Pqueue=util.PriorityQueue ()# Define a    PriorityQueue Pqueue. 
+    queue=util.Queue()# Define a    Queue queue.
+    Pqueue=util.PriorityQueue ()# Define a    PriorityQueue Pqueue.
     util.Queue.push(queue, state)# push  the state state into the Stack (satck) or Queue (queue)
     state=util.Queue.pop(queue)#  pop the last element from the Queue  queue.
     #STATE
@@ -233,13 +233,43 @@ def depthFirstSearch(problem):
 
     print("CODE END - depthFirstSearch")
     return  [s, s, w, s, w, w, s, w]
-	
+
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue=util.Queue() #Instantiate the queue
+    path = [] #Collection of the path from start to finish
+    visited = set() #Collection of the visited nodes
+    startNode = [problem.getStartState(), []] #Starting node of the pacman
+
+    util.Queue.push(queue, startNode) #Add starting node to queue to begin looping from
+
+    #Main loop, run while there are nodes in queue
+    while not util.Queue.isEmpty(queue):
+        (node,path) = util.Queue.pop(queue) #Expand node coordinates and path from queue
+
+        #Check if the current node is the goal node, if it is, break out of the loop
+        is_goal = problem.isGoalState(node)
+        if is_goal:
+            break
+
+        #Check if the current node is already visited
+        if node not in visited:
+            visited.add(node) #Add the current node to visited nodes list
+            successors = problem.getSuccessors(node) #Get successors of the current node
+
+            #Iterate through the child nodes of the current node
+            for successor in successors:
+                #Ignore successors that are already visited
+                if successor[0] not in visited:
+                    new_path = path + [successor[1]] #Create a new path and add the current node's action to it
+                    new_node = (successor[0], new_path) #Create new node with the path information
+                    util.Queue.push(queue, new_node) #Add the new node with the path information to queue
+
+    #Return the guide to the goal (e.g. ["West", "West", "South", ...])
+    return path
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
