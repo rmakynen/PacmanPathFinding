@@ -115,10 +115,10 @@ def depthFirstSearch(problem):
         else:
             return(None)
         return
-    
+
     xy=problem.getStartState() # get the starting position.
     _dfs(xy)
-    
+
     result=[]           #list of directions that we return
     #print("POP STACK: --------")
     while False == stack.isEmpty():
@@ -238,16 +238,19 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    queue=util.Queue() #Instantiate the queue
+    queue = util.Queue() #Instantiate the queue
     path = [] #Collection of the path from start to finish
     visited = set() #Collection of the visited nodes
     startNode = [problem.getStartState(), []] #Starting node of the pacman
 
     util.Queue.push(queue, startNode) #Add starting node to queue to begin looping from
+    is_goal = False #Set goal to false
 
-    #Main loop, run while there are nodes in queue
-    while not util.Queue.isEmpty(queue):
-        (node,path) = util.Queue.pop(queue) #Expand node coordinates and path from queue
+    #Main loop, run while goal is not found
+    while not is_goal:
+        #Check if Queue is empty
+        if not util.Queue.isEmpty(queue):
+            (node, path) = util.Queue.pop(queue) #Extract node and path from the next node in queue
 
         #Check if the current node is the goal node, if it is, break out of the loop
         is_goal = problem.isGoalState(node)
@@ -263,8 +266,8 @@ def breadthFirstSearch(problem):
             for successor in successors:
                 #Ignore successors that are already visited
                 if successor[0] not in visited:
-                    new_path = path + [successor[1]] #Create a new path and add the current node's action to it
-                    new_node = (successor[0], new_path) #Create new node with the path information
+                    new_node_path = path + [successor[1]] #Create a new path and add the current successor's action to it
+                    new_node = (successor[0], new_node_path) #Create new node with the path information
                     util.Queue.push(queue, new_node) #Add the new node with the path information to queue
 
     #Return the guide to the goal (e.g. ["West", "West", "South", ...])
@@ -285,7 +288,44 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue=util.PriorityQueue() #Instantiate the priorityqueue
+    path = [] #Collection of the path from start to finish
+    visited = set() #Collection of the visited nodes
+    startNode = [problem.getStartState(), [], 0] #Starting node of the pacman, this time also add cost (0)
+
+    cost = startNode[2] + heuristic(startNode[0], problem) #Set the initial cost
+    util.PriorityQueue.push(queue, startNode, cost) #Add starting node to queue to begin looping from
+
+    is_goal = False #Set goal to false
+
+    #Main loop, run while goal is not found
+    while not is_goal:
+        #Check if PriorityQueue is empty
+        if not util.PriorityQueue.isEmpty(queue):
+            (node, path, cost) = util.PriorityQueue.pop(queue) #Extract node, path and cost from the next node in queue
+
+        #Check if the current node is the goal node, if it is, break out of the loop
+        is_goal = problem.isGoalState(node)
+        if is_goal:
+            break
+
+        #Check if the current node is already visited
+        if node not in visited:
+            visited.add(node) #Add the current node to visited nodes list
+            successors = problem.getSuccessors(node) #Get successors of the current node
+
+            #Iterate through the child nodes of the current node
+            for successor in successors:
+                #Ignore successors that are already visited
+                if successor[0] not in visited:
+                    new_node_path = path + [successor[1]] #Create a new path and add the current succesor's action to it
+                    new_node_cost = cost + successor[2] #Create new cost
+                    new_node = (successor[0], new_node_path, new_node_cost) #Create new node with the path information and cost
+                    heuristic_cost = new_node_cost + heuristic(successor[0], problem) #Calculate heuristic cost
+                    util.PriorityQueue.push(queue, new_node, heuristic_cost) #Add the new node with the path information to queue and the heuristic cost
+
+    #Return the guide to the goal (e.g. ["West", "West", "South", ...])
+    return path
 
 
 # Abbreviations
