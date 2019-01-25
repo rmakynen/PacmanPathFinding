@@ -220,15 +220,15 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     startNode = [problem.getStartState(), [], 0] #Starting node of the pacman, this time also add cost (0)
 
     cost = startNode[2] + heuristic(startNode[0], problem) #Set the initial cost
-    util.PriorityQueue.push(queue, startNode, cost) #Add starting node to queue to begin looping from
+    queue.push(startNode, cost) #Add starting node to queue to begin looping from
 
     is_goal = False #Set goal to false
 
     #Main loop, run while goal is not found
     while not is_goal:
         #Check if PriorityQueue is empty
-        if not util.PriorityQueue.isEmpty(queue):
-            (node, path, cost) = util.PriorityQueue.pop(queue) #Extract node, path and cost from the next node in queue
+        if not queue.isEmpty():
+            (node, path, cost) = queue.pop() #Extract node, path and cost from the next node in queue
 
         #Check if the current node is the goal node, if it is, break out of the loop
         is_goal = problem.isGoalState(node)
@@ -248,9 +248,10 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                     new_node_cost = cost + successor[2] #Create new cost
                     new_node = (successor[0], new_node_path, new_node_cost) #Create new node with the path information and cost
                     heuristic_cost = new_node_cost + heuristic(successor[0], problem) #Calculate heuristic cost
-                    util.PriorityQueue.push(queue, new_node, heuristic_cost) #Add the new node with the path information to queue and the heuristic cost
+                    queue.push(new_node, heuristic_cost) #Add the new node with the path information to queue and the heuristic cost
 
     #Return the guide to the goal (e.g. ["West", "West", "South", ...])
+    #print(path)
     return path
 
 
