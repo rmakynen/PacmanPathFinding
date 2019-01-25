@@ -40,6 +40,7 @@ from game import Actions
 import util
 import time
 import search
+import sys
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -376,6 +377,25 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
+    
+    #TODO: Mark nodes that have been visited already.
+    
+    xy_pacman = state[0]
+    shortest_dist = sys.maxint
+    best_corner = None
+    for aCorner in corners:
+        dist = util.manhattanDistance( xy_pacman, aCorner )
+        # print("Dist for corner: "+str(aCorner) + " is: "+str(dist))
+        if dist < shortest_dist:
+            shortest_dist = dist
+            best_corner = aCorner
+    # print("Best corner: "+str(best_corner) + " is: "+str(shortest_dist))
+    my_heuristic = shortest_dist
+    return (my_heuristic)
+    
+    
+    
+    
     return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
