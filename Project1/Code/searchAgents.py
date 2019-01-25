@@ -392,7 +392,7 @@ def cornersHeuristic(state, problem):
         if state[1][x][y] == True and tuple == aCorner:
             corners_b.append(aCorner)
 
-    # if corne
+            
     shortest_dist = sys.maxint      #this is the distance to the closest corner
     #best_corner = None
     #What is the corner that is closest to our Pacman? Return the distance to the closest corner.
