@@ -282,6 +282,7 @@ class CornersProblem(search.SearchProblem):
         self.startingPosition = startingGameState.getPacmanPosition()
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
+
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
                 print 'Warning: no food in corner ' + str(corner)
@@ -290,13 +291,14 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
         self.markCorners = startingGameState.getFood()
+        
 
         #If no food in corners mark corners as goals anyway
         if self.markCorners.count() == 0:
             for corner in self.corners:
                 self.markCorners[corner[0]][corner[1]] = True
-        
-        self.start = (startingGameState.getPacmanPosition(),self.markCorners)
+        #self.start = (startingGameState.getPacmanPosition(),self.markCorners)
+        self.start = (self.startingPosition,self.markCorners)
 
     def getStartState(self):
         """
@@ -377,6 +379,50 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
+    corners_b = []      #list of corners that we haven't yet visited.
+    xy_pacman = state[0]
+    #build a list of food that still needs to be eaten. This info is saved in list "corners_b"
+    for aCorner in corners:
+        x = aCorner[0]
+        y = aCorner[1]
+        tuple = (x,y)
+
+        if tuple == xy_pacman:  #We are at a food location --> return zero as heuristic.
+            return(0)
+        if state[1][x][y] == True and tuple == aCorner:
+            corners_b.append(aCorner)
+
+    # if corne
+    shortest_dist = sys.maxint      #this is the distance to the closest corner
+    #best_corner = None
+    #What is the corner that is closest to our Pacman? Return the distance to the closest corner.
+    for aCorner in corners_b:
+        dist = util.manhattanDistance( xy_pacman, aCorner )
+        # print("Dist for corner: "+str(aCorner) + " is: "+str(dist))
+        if dist < shortest_dist:
+            shortest_dist = dist
+            #best_corner = aCorner
+    # print("Best corner: "+str(best_corner) + " is: "+str(shortest_dist))
+    my_heuristic = shortest_dist
+    return (my_heuristic)
+'''
+def cornersHeuristic(state, problem):
+    """
+    A heuristic for the CornersProblem that you defined.
+
+      state:   The current search state
+               (a data structure you chose in your search problem)
+
+      problem: The CornersProblem instance for this layout.
+
+    This function should always return a number that is a lower bound on the
+    shortest path from the state to a goal of the problem; i.e.  it should be
+    admissible (as well as consistent).
+    """
+    corners = problem.corners # These are the corner coordinates
+    walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+
+    "*** YOUR CODE HERE ***"
     
     #TODO: Mark nodes that have been visited already.
     
@@ -392,12 +438,8 @@ def cornersHeuristic(state, problem):
     # print("Best corner: "+str(best_corner) + " is: "+str(shortest_dist))
     my_heuristic = shortest_dist
     return (my_heuristic)
-    
-    
-    
-    
     return 0 # Default to trivial solution
-
+'''
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__(self):
