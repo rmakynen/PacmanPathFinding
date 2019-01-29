@@ -504,6 +504,10 @@ def foodHeuristic(state, problem):
     is furthest away from our pacman, since this is the shortest possible distance that
     we can traverse in order to get all dots.
     '''
+    #If no food left. Then return 0
+    if foodGrid.count()==0:
+        return(0)
+
     from heapq import nlargest
     grid_height = foodGrid.height
     grid_width = foodGrid.width
@@ -513,12 +517,14 @@ def foodHeuristic(state, problem):
     for y in range(0,grid_height):
         for x in range(0,grid_width):
             if (foodGrid[x][y] == True):
-                dist =  util.manhattanDistance((x,y),position)
+                food_loc = (x,y)
+                dist =  util.manhattanDistance(food_loc,position)
+                #dist =  mazeDistance(position,food_loc ,problem.startingGameState)      #Exact distance to the furthest food.
                 food_block = ((x,y),dist)       #x,y tuple followed by the distance to those coordinates.
                 food_distances.append(food_block)
                 if(dist > maxDistance):
                     maxDistance = dist
-
+    #return(maxDistance)        #  <--------------------- FAST solution but not so accurate
     #2. Gather the n longest distances that we should find the exact distance to using the "mazeDistance" function
     n = 4   #How many items should we calculate the full distance to?
     nLongestDistance = nlargest(n, food_distances, key=lambda e:e[1])
