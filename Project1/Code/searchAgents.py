@@ -291,7 +291,7 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
         self.markCorners = startingGameState.getFood()
-        
+
 
         #If no food in corners mark corners as goals anyway
         if self.markCorners.count() == 0:
@@ -391,7 +391,7 @@ def cornersHeuristic(state, problem):
         if state[1][x][y] == True and tuple == aCorner:
             corners_b.append(aCorner)
 
-            
+
     shortest_dist = sys.maxint      #this is the distance to the closest corner
     #best_corner = None
     #What is the corner that is closest to our Pacman? Return the distance to the closest corner.
@@ -530,7 +530,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.uniformCostSearch(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -566,7 +566,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.food[x][y]
 
 def mazeDistance(point1, point2, gameState):
     """
