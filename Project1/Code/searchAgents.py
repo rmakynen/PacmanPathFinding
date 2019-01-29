@@ -469,6 +469,7 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
         self.searchType = FoodSearchProblem
 
+
 def foodHeuristic(state, problem):
     """
     Your heuristic for the FoodSearchProblem goes here.
@@ -497,9 +498,44 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+    
+    #problem.walls 
+    #problem.startingGameState 
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    '''
+    An optimistic (admissible) heuristic is one that gives the distance to the dot that 
+    is furthest away from our pacman, since this is the shortest possible distance that
+    we can traverse in order to get all dots.
+    '''
+    from heapq import nlargest
+    grid_height = foodGrid.height
+    grid_width = foodGrid.width
+    #1. Calculate distance with manhattan to all foods. We use manhattan initially because it's much faster than "mazeDistance".
+    food_distances=[]
+    maxDistance = 0
+    for y in range(0,grid_height):
+        for x in range(0,grid_width):
+            if (foodGrid[x][y] == True):
+                dist =  util.manhattanDistance((x,y),position)
+                food_block = ((x,y),dist)       #x,y tuple followed by the distance to those coordinates.
+                food_distances.append(food_block)
+                if(dist > maxDistance):
+                    maxDistance = dist
+
+    #2. Gather the n longest distances that we should find the exact distance to using the "mazeDistance" function
+    n = 4   #How many items should we calculate the full distance to?
+    nLongestDistance = nlargest(n, food_distances, key=lambda e:e[1])
+    maxDistance = 0
+    #3. Calculate the exact length to the top "n" elements. Looking for the longest distance possible.
+    for aLongDist in nLongestDistance:
+        food_loc = aLongDist[0]     #(x,y)  tuple
+        dist =  mazeDistance(position,food_loc ,problem.startingGameState)      #Exact distance to the furthest food.
+        if(dist > maxDistance):
+            maxDistance = dist
+    #Return maxdistance as heuristic
+    heuristic = maxDistance
+    return(heuristic)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
