@@ -84,13 +84,22 @@ class ReflexAgent(Agent):
            dist_to_ghost = manhattanDistance(current_ghost,newPos)
 
            if newScaredTimes[i-1] > 2:
-               break
+               continue  #we don't want to break since the other ghost could still be dangerous.
+               # break
            elif dist_to_ghost < 2:
                return -10000
 
         if action == "Stop":
             return 0
-
+            
+        #The less food we have left the better score for food should be.
+        food_score=newFood.count()
+        if food_score==0:
+            pass
+        else:
+            food_score = 80/(1+food_score)
+        # food_score=0      #By using food_score =0 
+            
         min_dist = 99999
         for food in oldFood.asList():
             dist_to_food = manhattanDistance(food,newPos)
@@ -98,9 +107,11 @@ class ReflexAgent(Agent):
                 min_dist = dist_to_food
 
         if min_dist == 0:
-            return 100
-
-        return 100/min_dist
+            food_score+=100
+            #return 100
+        else:
+            food_score+=(100)/min_dist
+        return (food_score)
 
 def scoreEvaluationFunction(currentGameState):
     """
