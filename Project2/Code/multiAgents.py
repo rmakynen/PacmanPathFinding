@@ -114,6 +114,10 @@ def scoreEvaluationFunction(currentGameState):
       This evaluation function is meant for use with adversarial search agents
       (not reflex agents).
     """
+    print("Inside \"scoreEvaluationFunction\" -----------------------------------------")
+    print("Eval function for task 2")
+    
+    
     return currentGameState.getScore()
 
 class MultiAgentSearchAgent(Agent):
@@ -159,6 +163,36 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+        print("Inside \"getAction\" -------------------------------------------------------")
+        # successorGameState = currentGameState.generatePacmanSuccessor(action)
+        # newPos = successorGameState.getPacmanPosition()
+        # newFood = successorGameState.getFood()
+        # newGhostStates = successorGameState.getGhostStates()
+        # newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        # newGhostPositions = currentGameState.getGhostPositions()
+        # oldPos = currentGameState.getPacmanPosition()
+        # oldFood = currentGameState.getFood()
+
+        
+        eval = self.evaluationFunction(gameState)
+        agents = gameState.getNumAgents()
+        ghost_count = 0
+        if agents > 0:
+            ghost_count = agents-1
+
+            
+
+        #Loop through all agents and print their possible actions.
+        for i in range (0,agents):
+            actions = gameState.getLegalActions(i)
+            print("Possible actions for this actor: "+str(actions))
+        
+        #action = "e"
+        print("Eval:    "+str(eval))
+        print("Agents:  "+str(agents))
+        print("Depth:   "+str(self.depth))
+        
+        
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
