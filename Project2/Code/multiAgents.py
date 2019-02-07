@@ -27,8 +27,6 @@ class ReflexAgent(Agent):
       it in any way you see fit, so long as you don't touch our method
       headers.
     """
-
-
     def getAction(self, gameState):
         """
         You do not need to change this method, but you're welcome to.
@@ -79,6 +77,7 @@ class ReflexAgent(Agent):
         oldFood = currentGameState.getFood()
         agentCount = currentGameState.getNumAgents()
 
+        #If Ghost is close, then give small score to that node.
         for i in range(1,agentCount):
            current_ghost = successorGameState.getGhostPosition(i)
            dist_to_ghost = manhattanDistance(current_ghost,newPos)
@@ -87,12 +86,14 @@ class ReflexAgent(Agent):
                continue  #we don't want to break since the other ghost could still be dangerous.
            elif dist_to_ghost < 2:
                return -10000
-
+        #Stop actions doesn't provide positive bonuses. Therefore return 0.
         if action == "Stop":
-            return 0
+            return(0)
             
         #The less food we have left the better score for food should be:
-        food_score=(oldFood.count()-newFood.count())*120            
+        food_score=(oldFood.count()-newFood.count())*120
+        
+        #food_score should be higher if we will be close to other new food.
         min_dist = 99999
         for food in oldFood.asList():
             dist_to_food = manhattanDistance(food,newPos)
