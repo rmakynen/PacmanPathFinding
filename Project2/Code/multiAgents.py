@@ -15,7 +15,7 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
-
+import sys
 from game import Agent
 
 class ReflexAgent(Agent):
@@ -140,6 +140,66 @@ class MultiAgentSearchAgent(Agent):
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
 
+        
+class RootNode:
+    def __init__(self):
+        self.children = []
+    def getChildren(self):
+        return(self.children)
+    def addChild(self,anObject):
+        self.children.append(anObject)
+        
+class ANode(RootNode):
+    def __init__(self, xy, score):
+        RootNode.__init__(self)
+        self.xy = xy
+        self.score = score
+        #self.children = []
+    def __str__(self):
+        xy = str(self.xy)
+        score = str(self.score)
+        children = str(self.children)
+        return (xy + "; " + score+ "; " + children)
+    def getXY(self):
+        return(self.xy)
+    def getScore(self):
+        return(self.score)
+
+class MaxNode(ANode):
+    def __init__(self, xy, score):
+        ANode.__init__(self, xy, score)
+    def getMax(self):
+        all_children = self.getChildren()
+        max = -sys.maxint
+        maxChild=None
+        # for i,aChild in enumerate(all_children):
+        for aChild in all_children:
+            child_score = aChild.getScore()
+            # print(child_score)
+            if child_score > max:
+                maxChild=aChild
+                max = child_score
+        return(maxChild)
+        
+class MinNode(ANode):
+    def __init__(self, xy, score):
+        ANode.__init__(self, xy, score)
+    def getMin(self):
+        all_children = self.getChildren()
+        min = sys.maxint
+        minChild=None
+        # for i,aChild in enumerate(all_children):
+        for aChild in all_children:
+            child_score = aChild.getScore()
+            # print(child_score)
+            if child_score < min:
+                minChild=aChild
+                min = child_score
+        return(minChild)
+
+
+        
+		
 class MinimaxAgent(MultiAgentSearchAgent):
     """
       Your minimax agent (question 2)
@@ -163,6 +223,43 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+        
+        #testing MaxNode
+        # aMax = MaxNode((10,5),5)
+        # aMax2 = MaxNode((3,3),3)
+        # aMax3 = MaxNode((4,4),4)
+        # aMax.addChild(aMax2)
+        # aMax.addChild(aMax3)
+        # maxChild = aMax.getMax()
+        # if maxChild != None:
+            # print("maxChild: "+str(maxChild))
+
+        #testing MinNode
+        # aMin = MinNode((10,5),5)
+        # aMin.addChild(aMax2)
+        # aMin.addChild(aMax3)
+        
+        # minChild = aMin.getMin()
+        # if minChild != None:
+            # print("minChild: "+str(minChild))
+            
+            
+        root=MaxNode((0,0),0)
+        
+        # root=RootNode()
+        
+        for i in range (0,self.depth):
+            print("Current depth:"+str(i)+" ------------------------------------------------")
+            for i in range (0,3):
+                newChild = MinNode((i,i),i)
+                root.addChild(newChild)
+        
+        maxChild = root.getMax()
+        if maxChild != None:
+            print("maxChild: "+str(maxChild))
+        
+
+        
         print("Inside \"getAction\" -------------------------------------------------------")
         # successorGameState = currentGameState.generatePacmanSuccessor(action)
         # newPos = successorGameState.getPacmanPosition()
