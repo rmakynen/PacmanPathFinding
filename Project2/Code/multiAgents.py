@@ -114,8 +114,8 @@ def scoreEvaluationFunction(currentGameState):
       This evaluation function is meant for use with adversarial search agents
       (not reflex agents).
     """
-    print("Inside \"scoreEvaluationFunction\" -----------------------------------------")
-    print("Eval function for task 2")
+    # print("Inside \"scoreEvaluationFunction\" -----------------------------------------")
+    # print("Eval function for task 2")
     
     
     return currentGameState.getScore()
@@ -140,34 +140,64 @@ class MultiAgentSearchAgent(Agent):
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
 
-        
 class RootNode:
     def __init__(self):
         self.children = []
+        self.parent = None
+        self.nodeType = "RootNode"
+    def hasChildren(self):
+        return(len(self.children)!=0)
+    def hasParent(self):
+        return(self.parent != None)
     def getChildren(self):
         return(self.children)
     def addChild(self,anObject):
         self.children.append(anObject)
+    def setParent(self,anObject):
+        self.parent = anObject
+	def getParent(self):
+		return(self.parent)
+	def getNodeType(self):
+		return(self.nodeType)
         
-class ANode(RootNode):
-    def __init__(self, xy, score):
+class GenericNode(RootNode):
+    # def __init__(self, gameState, score, action):
+    def __init__(self, gameState, action):
         RootNode.__init__(self)
-        self.xy = xy
-        self.score = score
-        #self.children = []
+        self.gameState = gameState
+        # self.score = score
+        self.score = None
+        self.nodeType = "GenericNode"
+        GenericNode.action = action
+	def getNodeAction(self):
+		return(self.action)
+	def getNodeType(self):
+		return(self.nodeType)
     def __str__(self):
-        xy = str(self.xy)
+        gameState = str(self.gameState)
         score = str(self.score)
         children = str(self.children)
-        return (xy + "; " + score+ "; " + children)
-    def getXY(self):
-        return(self.xy)
+        return (gameState + "; " + score+ "; " + children)
+    def getState(self):
+        return(self.gameState)
     def getScore(self):
         return(self.score)
+    def setScore(self,score):
+        self.score = score        
 
-class MaxNode(ANode):
-    def __init__(self, xy, score):
-        ANode.__init__(self, xy, score)
+class MaxNode(GenericNode):
+    # def __init__(self, gameState, score, action):
+        # GenericNode.__init__(self, gameState, score, action)
+    def __init__(self, gameState, action):
+        GenericNode.__init__(self, gameState, action)
+        self.nodeType = "MaxNode"
+    def getNodeAction(self):
+        return(GenericNode.action)
+    def getNodeType(self):
+        return(self.nodeType)
+    #Get either Min or max depending on the node type for MaxNode class object its always max
+    def getBestNode(self):
+        return(self.getMax)
     def getMax(self):
         all_children = self.getChildren()
         max = -sys.maxint
@@ -181,9 +211,19 @@ class MaxNode(ANode):
                 max = child_score
         return(maxChild)
         
-class MinNode(ANode):
-    def __init__(self, xy, score):
-        ANode.__init__(self, xy, score)
+class MinNode(GenericNode):
+    # def __init__(self, gameState, score, action):
+        # GenericNode.__init__(self, gameState, score, action)
+    def __init__(self, gameState, action):
+        GenericNode.__init__(self, gameState, action)
+        self.nodeType = "MinNode"
+    def getNodeAction(self):
+        return(GenericNode.action)
+    def getNodeType(self):
+        return(self.nodeType)
+    #Get either Min or max depending on the node type for MinNode class object its always min
+    def getBestNode(self):
+        return(self.getMin)
     def getMin(self):
         all_children = self.getChildren()
         min = sys.maxint
@@ -197,9 +237,6 @@ class MinNode(ANode):
                 min = child_score
         return(minChild)
 
-
-        
-		
 class MinimaxAgent(MultiAgentSearchAgent):
     """
       Your minimax agent (question 2)
@@ -223,44 +260,144 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+        # print("Inside \"getAction\" -------------------------------------------------------")
+
+        #eval = self.evaluationFunction(gameState)
         
-        #testing MaxNode
-        # aMax = MaxNode((10,5),5)
-        # aMax2 = MaxNode((3,3),3)
-        # aMax3 = MaxNode((4,4),4)
-        # aMax.addChild(aMax2)
-        # aMax.addChild(aMax3)
-        # maxChild = aMax.getMax()
+        agent_count = gameState.getNumAgents()
+        ghost_count = 0
+        if agent_count > 0:
+            ghost_count = agent_count-1
+        # ---------------------------------------------------------------------------------
+        def incrementAgentIndex(agentIndex):
+            if ghost_count == 0:
+                return(0)
+            agentIndex +=1
+            if agentIndex >= agent_count:
+                agentIndex=0
+            return(agentIndex)
+        # ---------------------------------------------------------------------------------
+        def getDepth(agentIndex):
+            if agentIndex == 0:
+                return(1)
+            return(0)
+        # ---------------------------------------------------------------------------------
+
+        target_depth = self.depth
+        target_depth=2
+        def miniMax(parent,agentIndex,current_depth):
+            print("-----------------------------------------------")
+            agentIndex=incrementAgentIndex(agentIndex)
+            # if parent.hasParent:
+            current_depth += getDepth(agentIndex)
+            if current_depth == target_depth:
+                return
+            print("agentIndex:  #"+str(agentIndex))
+            print("current_depth: -------> "+str(current_depth)+" <-------")
+            
+            
+            # print(parent)
+            parentState=parent.getState()
+            print(parentState)
+            # parentState = None
+            # if parent == None:
+                # global gameState
+                # parentState = gameState
+  
+            actions = parentState.getLegalActions(agentIndex)
+            print("Possible actions for agent["+str(agentIndex)+"] are: "+str(actions))
+            for action in actions:
+                childState = parentState.generateSuccessor(agentIndex, action)
+                print("action: "+str(action))
+                # print(childState)
+                #score = self.evaluationFunction(childState)
+                # score = None
+                # print("score is: "+str(score))
+                if agentIndex == 0:
+                    childNode = MaxNode(childState,action)
+                else:
+                    childNode = MinNode(childState,action)
+                childNode.setParent(parent)
+               
+                # if current_depth < target_depth:   # if current_depth < self.depth:
+
+                miniMax(childNode,agentIndex,current_depth)
+                parent.addChild(childNode)
+                break
+
+        # ---------------------------------------------------------------------------------
+        # gameState_=None
+        # score_= 0
+        action_ = None
+        root=MaxNode(gameState,action_)   
+
+        print("---------------------======================---------------------------------=======================================----")
+        miniMax(root,-1,-1)
+        print("---------------------======================---------------------------------=======================================----")
+        print("Now print the entire TREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEeeeEEEEEEEEEEe")
+        # node = root
+        # while True:
+        # for i in range (0,1):
+            # if node.hasChildren():
+                # for a
+                # gameState = node.getState()
+                # if gameState != None:
+                    # print(gameState)
+                    
+        global counter
+        counter=0
+        def printTree(node):
+            if node.hasChildren():
+                # print("Yes, the node has children: "+str(node.getState()))
+                for aChild in node.getChildren():
+                    # print(printTree(aChild))
+                    printTree(aChild)
+                    # print(aChild)
+            if node.getNodeAction() != None:
+                gameState = node.getState()
+                if gameState != None:
+                    global counter
+                    counter+=1
+                    print("----------------------------------------------------------")
+                    print(gameState)
+            return
+                # nodeState = gameState.generateSuccessor(0, "Stop")
+                # print(nodeState)
+			# print(node)
+            # else:
+                # print(node)
+            
+        # printTree(root)
+        
+        print("----------------------------------------------------------")
+        print(counter)
+        
+        # if root.hasChildren():
+            # for aChild in root.getChildren():
+                # print("----------------------------")
+                # print(aChild.getNodeType())
+                # print(aChild.getScore())
+                # print(aChild.getNodeAction())
+                
+        #print(root.hasChildren())
+        
+        # thing
+        
+        # for i in range (0,self.depth):
+            # print("Current depth:"+str(i)+" ------------------------------------------------")
+            # for i in range (0,3):
+                # newChild = MinNode((i,i),i)
+                # newChild.setParent(node)		#set parent of the child
+                # node.addChild(newChild)			#Add a new child to the parent	
+				
+        
+        # maxChild = root.getMax()
         # if maxChild != None:
             # print("maxChild: "+str(maxChild))
-
-        #testing MinNode
-        # aMin = MinNode((10,5),5)
-        # aMin.addChild(aMax2)
-        # aMin.addChild(aMax3)
-        
-        # minChild = aMin.getMin()
-        # if minChild != None:
-            # print("minChild: "+str(minChild))
-            
-            
-        root=MaxNode((0,0),0)
-        
-        # root=RootNode()
-        
-        for i in range (0,self.depth):
-            print("Current depth:"+str(i)+" ------------------------------------------------")
-            for i in range (0,3):
-                newChild = MinNode((i,i),i)
-                root.addChild(newChild)
-        
-        maxChild = root.getMax()
-        if maxChild != None:
-            print("maxChild: "+str(maxChild))
+            #print("maxChild's parent: "+str(maxChild.getParent()))
         
 
         
-        print("Inside \"getAction\" -------------------------------------------------------")
         # successorGameState = currentGameState.generatePacmanSuccessor(action)
         # newPos = successorGameState.getPacmanPosition()
         # newFood = successorGameState.getFood()
@@ -271,23 +408,16 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # oldFood = currentGameState.getFood()
 
         
-        eval = self.evaluationFunction(gameState)
-        agents = gameState.getNumAgents()
-        ghost_count = 0
-        if agents > 0:
-            ghost_count = agents-1
-
-            
 
         #Loop through all agents and print their possible actions.
-        for i in range (0,agents):
-            actions = gameState.getLegalActions(i)
-            print("Possible actions for this actor: "+str(actions))
+        # for i in range (0,agents):
+            # actions = gameState.getLegalActions(i)
+            # print("Possible actions for this actor: "+str(actions))
         
         #action = "e"
-        print("Eval:    "+str(eval))
-        print("Agents:  "+str(agents))
-        print("Depth:   "+str(self.depth))
+        # print("Eval:    "+str(eval))
+        # print("Agents:  "+str(agents))
+        # print("Depth:   "+str(self.depth))
         
         
         util.raiseNotDefined()
