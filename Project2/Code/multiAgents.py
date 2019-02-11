@@ -106,7 +106,7 @@ class ReflexAgent(Agent):
             food_score+=(100)/min_dist
         return (food_score)
 
-def scoreEvaluationFunction(currentGameState,oldState):
+def scoreEvaluationFunction(currentGameState):
     """
       This default evaluation function just returns the score of the state.
       The score is the same one displayed in the Pacman GUI.
@@ -114,6 +114,22 @@ def scoreEvaluationFunction(currentGameState,oldState):
       This evaluation function is meant for use with adversarial search agents
       (not reflex agents).
     """
+    return currentGameState.getScore()
+
+
+def scoreEvaluationFunction2(currentGameState,oldState):
+    """
+      This default evaluation function just returns the score of the state.
+      The score is the same one displayed in the Pacman GUI.
+
+      This evaluation function is meant for use with adversarial search agents
+      (not reflex agents).
+    """
+    
+    food_score = currentGameState.getScore()
+    ghost_dist_score=0
+    return (ghost_dist_score, food_score)
+    
     # print("Inside \"scoreEvaluationFunction\" -----------------------------------------")
     # print("Eval function for task 2")
 
@@ -173,7 +189,6 @@ def scoreEvaluationFunction(currentGameState,oldState):
     return (ghost_dist_score,food_score)
 
 
-    # return currentGameState.getScore()
 
 class MultiAgentSearchAgent(Agent):
     """
@@ -246,6 +261,11 @@ class MaxNode(GenericNode):
     def __init__(self, gameState, action):
         GenericNode.__init__(self, gameState, action)
         self.nodeType = "MaxNode"
+        self.score = None
+    def getScore(self):
+        return(self.score)
+    # def getScore(self):
+        # return(self.getBestNode())
     def getNodeAction(self):
         return(GenericNode.action)
     def getNodeType(self):
@@ -253,7 +273,94 @@ class MaxNode(GenericNode):
     #Get either Min or max depending on the node type for MaxNode class object its always max
     def getBestNode(self):
         return(self.getMax)
-    def getMax(self):
+    def getBestNodeValue(self):
+        return(self.getMax("value"))
+    def getMax(self, *args, **kwargs):
+        return_object=1
+        if len(args) == 1 and args[0] == "value":
+            return_object=0
+        all_children = self.getChildren()
+        max = -sys.maxint
+        maxChild=None
+        # for i,aChild in enumerate(all_children):
+        for aChild in all_children:
+            # child_score = aChild.getScore()
+            child_score = aChild.getBestNodeValue()
+            # print(child_score)
+            if child_score > max:
+                maxChild=aChild
+                max = child_score
+        self.score = max
+        if return_object == 0:
+            if max == -sys.maxint:
+                return(None)
+            return(max)
+        
+        return(maxChild)
+        
+class MinNode(GenericNode):
+    # def __init__(self, gameState, score, action):
+        # GenericNode.__init__(self, gameState, score, action)
+    def __init__(self, gameState, action):
+        GenericNode.__init__(self, gameState, action)
+        self.nodeType = "MinNode"
+        # self.score = None
+    # def getScore(self):
+        # return(self.score)
+    # def getScore(self):
+        # return(GenericNode.getScore())
+    def getNodeAction(self):
+        return(GenericNode.action)
+    def getNodeType(self):
+        return(self.nodeType)
+    #Get either Min or max depending on the node type for MinNode class object its always min
+    def getBestNode(self):
+        return(self.getMin)
+    def getBestNodeValue(self):
+        return(self.getMin("value"))
+    # def getMin(self):
+        # all_children = self.getChildren()
+        # min = sys.maxint
+        # minChild=None
+        # for aChild in all_children:
+            # child_score = aChild.getScore()
+            # if child_score < min:
+                # minChild=aChild
+                # min = child_score
+        # return(minChild)
+    def getMin(self, *args, **kwargs):
+        return_object=1
+        if len(args) == 1 and args[0] == "value":
+            return_object=0
+            
+        all_children = self.getChildren()
+        min = sys.maxint
+        minChild=None
+        # for i,aChild in enumerate(all_children):
+        for aChild in all_children:
+            # child_score = aChild.getScore()
+            child_score = aChild.getBestNodeValue()
+            # print(child_score)
+            if child_score < min:
+                minChild=aChild
+                min = child_score
+                
+                
+                
+        if return_object == 0:
+            if min == sys.maxint:
+                return(None)
+            return(min)
+            
+        return(minChild)
+        
+        # self.score = max
+        
+    '''
+    def getMax(self, *args, **kwargs):
+        return_object=1
+        if len(args) == 1 and args[0] == "value":
+            return_object=0
         all_children = self.getChildren()
         max = -sys.maxint
         maxChild=None
@@ -264,33 +371,15 @@ class MaxNode(GenericNode):
             if child_score > max:
                 maxChild=aChild
                 max = child_score
-        return(maxChild)
+        self.score = max
+        if return_object == 0:
+            if max == -sys.maxint:
+                return(None)
+            return(max)
         
-class MinNode(GenericNode):
-    # def __init__(self, gameState, score, action):
-        # GenericNode.__init__(self, gameState, score, action)
-    def __init__(self, gameState, action):
-        GenericNode.__init__(self, gameState, action)
-        self.nodeType = "MinNode"
-    def getNodeAction(self):
-        return(GenericNode.action)
-    def getNodeType(self):
-        return(self.nodeType)
-    #Get either Min or max depending on the node type for MinNode class object its always min
-    def getBestNode(self):
-        return(self.getMin)
-    def getMin(self):
-        all_children = self.getChildren()
-        min = sys.maxint
-        minChild=None
-        # for i,aChild in enumerate(all_children):
-        for aChild in all_children:
-            child_score = aChild.getScore()
-            # print(child_score)
-            if child_score < min:
-                minChild=aChild
-                min = child_score
-        return(minChild)
+        return(maxChild)
+    '''
+        
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
@@ -342,15 +431,16 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 return(-1)
             nodeState = node.getState()
             oldState = oldNode.getState()
-            
-            
             nodeAction = node.getNodeAction()
-            # print("NODEE,,,,,,,,,,,,,,,,,,: "+str(nodeAction))
-            ghost_score, food_score = self.evaluationFunction(nodeState,oldState)
-            if nodeAction == "Stop":
-                food_score=-1
+            '''
+            a better evaluation function call:
+            # ghost_score, food_score = self.evaluationFunction2(nodeState,oldState)
+            # if nodeAction == "Stop":
+                # food_score=-1
                 # return(ghost_dist_score)
-            score = ghost_score + food_score
+            # score = ghost_score + food_score
+            '''
+            score = self.evaluationFunction(nodeState)
             if agentIndex == 0:
                 print("-----------------------------------------------")
                 print("current_depth: -------> "+str(current_depth+1)+" <-------")
@@ -361,13 +451,19 @@ class MinimaxAgent(MultiAgentSearchAgent):
             return(score)
         # ---------------------------------------------------------------------------------  
         target_depth = self.depth
-        # global target_depth_reached
-        # target_depth_reached = False
+        global target_depth_reached
+        target_depth_reached = False
         def miniMax(parent,agentIndex,current_depth):
             global target_depth_reached
             agentIndex=incrementAgentIndex(agentIndex)
             current_depth += getDepth(agentIndex)
+            # print("current_depth: "+str(current_depth))
+            # print("target_depth:  "+str(target_depth))
+            # sys.exit(1)
+            
+            
             if current_depth == target_depth:
+                target_depth_reached = True
                 return
             # print("agentIndex:  #"+str(agentIndex))
             # print("current_depth: -------> "+str(current_depth+1)+" <-------")
@@ -377,32 +473,46 @@ class MinimaxAgent(MultiAgentSearchAgent):
   
             actions = parentState.getLegalActions(agentIndex)
             print("Possible actions for agent["+str(agentIndex)+"] are: "+str(actions))
-            for action in actions:
+            # for action in actions:
+            for i,action in enumerate(actions):
                 childState = parentState.generateSuccessor(agentIndex, action)
+                
                 # print("action: "+str(action))
                 # print(childState)
                 # score = self.evaluationFunction(childState)
                 # score = None
                 # print("score is: "+str(score))
+
                 if agentIndex == 0:
                     childNode = MaxNode(childState,action)
                 else:
                     childNode = MinNode(childState,action)
                 childNode.setParent(parent)
-                
-               
                 # if current_depth < target_depth:   # if current_depth < self.depth:
-
-                miniMax(childNode,agentIndex,current_depth)
-                
-                if agentIndex!=0:
-                    return
-                
-                score = giveScore(childNode,parent,agentIndex,current_depth,action)
-                # print("scoreeeeeee:"+str(score))
-                childNode.setScore(score)
-                
                 parent.addChild(childNode)
+                miniMax(childNode,agentIndex,current_depth)
+
+                #Alpha-Beta pruning --------------------------------------------------------------------------
+                should_continue_checking_scores=1
+                # if i>0:
+                    # if parent.getNodeType() == "MaxNode":
+                        # if agentIndex != 0:         #This is true when we have a MinNode
+                            # parent_best = parent.getBestNode()
+                            # if parent_best != None:
+                                # parent_best_val = parent.getBestNodeValue()
+                                # if parent_best_val != None:
+                                    # print("parent_best_val: "+str(parent_best_val))
+                                    # should_continue_checking_scores=0
+                
+
+                # if agentIndex!=0:
+                    # return
+                if should_continue_checking_scores == 1:
+                    if target_depth_reached==True:
+                        score = giveScore(childNode,parent,agentIndex,current_depth,action)
+                        print("scoreeeeeee:"+str(score))
+                        childNode.setScore(score)
+
                 # break
 
         # ---------------------------------------------------------------------------------
@@ -411,10 +521,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
         action_ = None
         root=MaxNode(gameState,action_)   
 
-        print("---------------------======================---------------------------------=======================================----")
+        # print("---------------------======================---------------------------------=======================================----")
         miniMax(root,-1,-1)
-        print("---------------------======================---------------------------------=======================================----")
-        print("Now print the entire TREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEeeeEEEEEEEEEEe")
+        # print("---------------------======================---------------------------------=======================================----")
+        # print("Now print the entire TREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEeeeEEEEEEEEEEe")
         # node = root
         # while True:
         # for i in range (0,1):
@@ -449,11 +559,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
             
         # printTree(root)
         
-        print("----------------------------------------------------------")
         if counter>0:
+            print("----------------------------------------------------------")
             print("How many members does the tree have: "+str(counter))
         
-        util.raiseNotDefined()
+        #util.raiseNotDefined()
         return("Stop")
         
         # if root.hasChildren():
