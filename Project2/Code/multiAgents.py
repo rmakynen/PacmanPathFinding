@@ -89,10 +89,10 @@ class ReflexAgent(Agent):
         #Stop actions doesn't provide positive bonuses. Therefore return 0.
         if action == "Stop":
             return(0)
-            
+
         #The less food we have left the better score for food should be:
         food_score=(oldFood.count()-newFood.count())*120
-        
+
         #food_score should be higher if we will be close to other new food.
         min_dist = 99999
         for food in oldFood.asList():
@@ -125,17 +125,17 @@ def scoreEvaluationFunction2(currentGameState,oldState):
       This evaluation function is meant for use with adversarial search agents
       (not reflex agents).
     """
-    
+
     food_score = currentGameState.getScore()
     ghost_dist_score=0
     return (ghost_dist_score, food_score)
-    
+
     # print("Inside \"scoreEvaluationFunction\" -----------------------------------------")
     # print("Eval function for task 2")
 
     # successorGameState = currentGameState.generatePacmanSuccessor(action)
     # newPos = successorGameState.getPacmanPosition()
-    
+
     newGhostStates = currentGameState.getGhostStates()
     newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
@@ -145,8 +145,8 @@ def scoreEvaluationFunction2(currentGameState,oldState):
     oldFood = oldState.getFood()
     newFood = currentGameState.getFood()
     # oldFood
-    
-    
+
+
     agentCount = currentGameState.getNumAgents()
 
     #If Ghost is close, then give small score to that node.
@@ -161,19 +161,19 @@ def scoreEvaluationFunction2(currentGameState,oldState):
         elif dist_to_ghost < 5:
             ghost_dist_score+=(-260/(1+dist_to_ghost*dist_to_ghost))
             #return (ghost_dist_score)
-          
-    # ghost_dist_score = 0  
+
+    # ghost_dist_score = 0
     #Stop actions doesn't provide positive bonuses. Therefore return.
     ##NOTE IMPLEMENT THE STOP ELSEWHERE. See line: ghost_score, food_score = self.evaluationFunction(nodeState)
     # if action == "Stop":
         # return(ghost_dist_score)
-        
+
     food_score=0
-        
+
     #The less food we have left the better score for food should be:
     food_score=(oldFood.count()-newFood.count())*120
     # food_score=0
-    
+
     #food_score should be higher if we will be close to other new food.
     min_dist = 999999999
     for food in newFood.asList():
@@ -229,7 +229,7 @@ class RootNode:
 		return(self.parent)
 	def getNodeType(self):
 		return(self.nodeType)
-        
+
 class GenericNode(RootNode):
     # def __init__(self, gameState, score, action):
     def __init__(self, gameState, action):
@@ -253,7 +253,7 @@ class GenericNode(RootNode):
     def getScore(self):
         return(self.score)
     def setScore(self,score):
-        self.score = score        
+        self.score = score
 
 class MaxNode(GenericNode):
     # def __init__(self, gameState, score, action):
@@ -295,9 +295,9 @@ class MaxNode(GenericNode):
             if max == -sys.maxint:
                 return(None)
             return(max)
-        
+
         return(maxChild)
-        
+
 class MinNode(GenericNode):
     # def __init__(self, gameState, score, action):
         # GenericNode.__init__(self, gameState, score, action)
@@ -332,7 +332,7 @@ class MinNode(GenericNode):
         return_object=1
         if len(args) == 1 and args[0] == "value":
             return_object=0
-            
+
         all_children = self.getChildren()
         min = sys.maxint
         minChild=None
@@ -344,18 +344,18 @@ class MinNode(GenericNode):
             if child_score < min:
                 minChild=aChild
                 min = child_score
-                
-                
-                
+
+
+
         if return_object == 0:
             if min == sys.maxint:
                 return(None)
             return(min)
-            
+
         return(minChild)
-        
+
         # self.score = max
-        
+
     '''
     def getMax(self, *args, **kwargs):
         return_object=1
@@ -376,10 +376,10 @@ class MinNode(GenericNode):
             if max == -sys.maxint:
                 return(None)
             return(max)
-        
+
         return(maxChild)
     '''
-        
+
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
@@ -407,7 +407,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # print("Inside \"getAction\" -------------------------------------------------------")
 
         #eval = self.evaluationFunction(gameState)
-        
+
         agent_count = gameState.getNumAgents()
         ghost_count = 0
         if agent_count > 0:
@@ -449,7 +449,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 print("My given score: "+str(score))
                 print("My State      : "+str(node.getState()))
             return(score)
-        # ---------------------------------------------------------------------------------  
+        # ---------------------------------------------------------------------------------
         target_depth = self.depth
         global target_depth_reached
         target_depth_reached = False
@@ -460,8 +460,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
             # print("current_depth: "+str(current_depth))
             # print("target_depth:  "+str(target_depth))
             # sys.exit(1)
-            
-            
+
+
             if current_depth == target_depth:
                 target_depth_reached = True
                 return
@@ -470,13 +470,13 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
             parentState=parent.getState()
             # print(parentState)
-  
+
             actions = parentState.getLegalActions(agentIndex)
             print("Possible actions for agent["+str(agentIndex)+"] are: "+str(actions))
             # for action in actions:
             for i,action in enumerate(actions):
                 childState = parentState.generateSuccessor(agentIndex, action)
-                
+
                 # print("action: "+str(action))
                 # print(childState)
                 # score = self.evaluationFunction(childState)
@@ -503,7 +503,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                                 # if parent_best_val != None:
                                     # print("parent_best_val: "+str(parent_best_val))
                                     # should_continue_checking_scores=0
-                
+
 
                 # if agentIndex!=0:
                     # return
@@ -519,7 +519,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # gameState_=None
         # score_= 0
         action_ = None
-        root=MaxNode(gameState,action_)   
+        root=MaxNode(gameState,action_)
 
         # print("---------------------======================---------------------------------=======================================----")
         miniMax(root,-1,-1)
@@ -533,7 +533,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 # gameState = node.getState()
                 # if gameState != None:
                     # print(gameState)
-                    
+
         global counter
         counter=0
         def printTree(node):
@@ -556,42 +556,42 @@ class MinimaxAgent(MultiAgentSearchAgent):
 			# print(node)
             # else:
                 # print(node)
-            
+
         # printTree(root)
-        
+
         if counter>0:
             print("----------------------------------------------------------")
             print("How many members does the tree have: "+str(counter))
-        
+
         #util.raiseNotDefined()
         return("Stop")
-        
+
         # if root.hasChildren():
             # for aChild in root.getChildren():
                 # print("----------------------------")
                 # print(aChild.getNodeType())
                 # print(aChild.getScore())
                 # print(aChild.getNodeAction())
-                
+
         #print(root.hasChildren())
-        
+
         # thing
-        
+
         # for i in range (0,self.depth):
             # print("Current depth:"+str(i)+" ------------------------------------------------")
             # for i in range (0,3):
                 # newChild = MinNode((i,i),i)
                 # newChild.setParent(node)		#set parent of the child
-                # node.addChild(newChild)			#Add a new child to the parent	
-				
-        
+                # node.addChild(newChild)			#Add a new child to the parent
+
+
         # maxChild = root.getMax()
         # if maxChild != None:
             # print("maxChild: "+str(maxChild))
             #print("maxChild's parent: "+str(maxChild.getParent()))
-        
 
-        
+
+
         # successorGameState = currentGameState.generatePacmanSuccessor(action)
         # newPos = successorGameState.getPacmanPosition()
         # newFood = successorGameState.getFood()
@@ -601,19 +601,19 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # oldPos = currentGameState.getPacmanPosition()
         # oldFood = currentGameState.getFood()
 
-        
+
 
         #Loop through all agents and print their possible actions.
         # for i in range (0,agents):
             # actions = gameState.getLegalActions(i)
             # print("Possible actions for this actor: "+str(actions))
-        
+
         #action = "e"
         # print("Eval:    "+str(eval))
         # print("Agents:  "+str(agents))
         # print("Depth:   "+str(self.depth))
-        
-        
+
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -625,7 +625,97 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        depth = self.depth * 2  # Depth of the minmax tree
+        alpha = -sys.maxint     # MAXs best option on path to root
+        beta = sys.maxint       # MINs best option on path to root
+        agent = 0               # Start with Pacman
+        nodeType = "max"        # Start with MAX node
+
+        """
+        Returns list that contains SCORE and ACTION
+        """
+        def miniMax(gameState, depth, alpha, beta, agent, nodeType):
+            # Check if we have reached the end of the tree or game is already won/lost
+            if depth <= 0 or gameState.isWin() or gameState.isLose():
+                return self.evaluationFunction(gameState), Directions.STOP
+
+            # Get the current legal actions of given agent
+            actions = gameState.getLegalActions(agent)
+            # Get last agent
+            lastAgent = gameState.getNumAgents() - 1
+            # List of best actions
+            bestActions = []
+
+            # MAX NODE
+            if nodeType == "max":
+                bestNodeScore = -sys.maxint         # Set to negative "infinite"
+
+                nextDepth = depth - 1               # Move down in depth level
+                nextNodeType = "min"                # Set next node type back to MIN
+                nextAgent = 1                       # Set next agent to first ghost
+
+                # Iterate through valid actions of the current agent
+                for action in actions:
+                    successorState = gameState.generateSuccessor(agent, action)
+                    nodeScore = miniMax(successorState, nextDepth, alpha, beta, nextAgent, nextNodeType)[0]
+
+                    # Always use larger number between score and alpha
+                    if nodeScore > alpha:
+                        alpha = nodeScore
+
+                    # Check if we have found new best MAX node with current action
+                    if nodeScore > bestNodeScore:
+                        bestNodeScore = nodeScore   # Our new best score
+                        bestActions = [action]      # Set action as a single best action
+
+                    elif nodeScore == bestNodeScore:
+                        bestActions.append(action)  # We have found another equally valid action
+
+                    # If best node score is larger than beta break out (pruning)
+                    if bestNodeScore > beta:
+                        break
+
+            # MIN NODE
+            elif nodeType == "min":
+                bestNodeScore = sys.maxint          # Set to positive "infinite"
+
+                # Check if we have not reached the last agent
+                if agent != lastAgent:
+                    nextDepth = depth               # Stay in the same depth
+                    nextAgent = agent + 1           # Move on to next agent (ghost)
+                    nextNodeType = "min"            # Set next node type to MIN
+                else:
+                    nextDepth = depth - 1           # Move down in depth level
+                    nextAgent = 0                   # Move back to pacman agent
+                    nextNodeType = "max"            # Set next node type back to MAX
+
+                # Iterate through valid actions of the current agent
+                for action in actions:
+                    successorState = gameState.generateSuccessor(agent, action)
+                    nodeScore = miniMax(successorState, nextDepth, alpha, beta, nextAgent, nextNodeType)[0]
+
+                    # Always use smaller number between score and beta
+                    if nodeScore < beta:
+                        beta = nodeScore
+
+                    # Check if we have found new best MIN node with current action
+                    if nodeScore < bestNodeScore:
+                        bestNodeScore = nodeScore   # Our new best score
+                        bestActions = [action]      # Set action as a single best action
+
+                    if nodeScore == bestNodeScore:
+                        bestActions.append(action)  # We have found another equally valid action
+
+                    # If best node score is smaller than alpha break out (pruning)
+                    if bestNodeScore < alpha:
+                        break
+
+            # Return SCORE and random ACTION from bestActions-list
+            return bestNodeScore, random.choice(bestActions)
+
+        # Return minimax action
+        minimaxAction = miniMax(gameState, depth, alpha, beta, agent, nodeType)[1]
+        return minimaxAction
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
