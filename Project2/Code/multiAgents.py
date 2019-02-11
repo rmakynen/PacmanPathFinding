@@ -106,7 +106,7 @@ class ReflexAgent(Agent):
             food_score+=(100)/min_dist
         return (food_score)
 
-def scoreEvaluationFunction(currentGameState):
+def scoreEvaluationFunction(currentGameState,oldState):
     """
       This default evaluation function just returns the score of the state.
       The score is the same one displayed in the Pacman GUI.
@@ -116,9 +116,64 @@ def scoreEvaluationFunction(currentGameState):
     """
     # print("Inside \"scoreEvaluationFunction\" -----------------------------------------")
     # print("Eval function for task 2")
+
+    # successorGameState = currentGameState.generatePacmanSuccessor(action)
+    # newPos = successorGameState.getPacmanPosition()
+    
+    newGhostStates = currentGameState.getGhostStates()
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+
+    "*** YOUR CODE HERE ***"
+    # newGhostPositions = currentGameState.getGhostPositions()
+    newPos = currentGameState.getPacmanPosition()
+    oldFood = oldState.getFood()
+    newFood = currentGameState.getFood()
+    # oldFood
     
     
-    return currentGameState.getScore()
+    agentCount = currentGameState.getNumAgents()
+
+    #If Ghost is close, then give small score to that node.
+    ghost_dist_score = 0
+    for i in range(1,agentCount):
+        # current_ghost = successorGameState.getGhostPosition(i)
+        current_ghost = currentGameState.getGhostPosition(i)
+        dist_to_ghost = manhattanDistance(current_ghost,newPos)
+
+        if newScaredTimes[i-1] > 2:
+           continue  #we don't want to break since the other ghost could still be dangerous.
+        elif dist_to_ghost < 5:
+            ghost_dist_score+=(-260/(1+dist_to_ghost*dist_to_ghost))
+            #return (ghost_dist_score)
+          
+    # ghost_dist_score = 0  
+    #Stop actions doesn't provide positive bonuses. Therefore return.
+    ##NOTE IMPLEMENT THE STOP ELSEWHERE. See line: ghost_score, food_score = self.evaluationFunction(nodeState)
+    # if action == "Stop":
+        # return(ghost_dist_score)
+        
+    food_score=0
+        
+    #The less food we have left the better score for food should be:
+    food_score=(oldFood.count()-newFood.count())*120
+    # food_score=0
+    
+    #food_score should be higher if we will be close to other new food.
+    min_dist = 999999999
+    for food in newFood.asList():
+        dist_to_food = manhattanDistance(food,newPos)
+        if dist_to_food < min_dist:
+            min_dist = dist_to_food
+
+    food_score+=100/(1+min_dist)
+    # if min_dist == 0:
+        # food_score+=100
+    # else:
+        # food_score+=(100)/min_dist
+    return (ghost_dist_score,food_score)
+
+
+    # return currentGameState.getScore()
 
 class MultiAgentSearchAgent(Agent):
     """
@@ -282,35 +337,51 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 return(1)
             return(0)
         # ---------------------------------------------------------------------------------
-
+        def giveScore(node,oldNode,agentIndex,current_depth,action):
+            if node == None:
+                return(-1)
+            nodeState = node.getState()
+            oldState = oldNode.getState()
+            
+            
+            nodeAction = node.getNodeAction()
+            # print("NODEE,,,,,,,,,,,,,,,,,,: "+str(nodeAction))
+            ghost_score, food_score = self.evaluationFunction(nodeState,oldState)
+            if nodeAction == "Stop":
+                food_score=-1
+                # return(ghost_dist_score)
+            score = ghost_score + food_score
+            if agentIndex == 0:
+                print("-----------------------------------------------")
+                print("current_depth: -------> "+str(current_depth+1)+" <-------")
+                print("agentIndex:     "+str(agentIndex))
+                print("action:         "+str(action))
+                print("My given score: "+str(score))
+                print("My State      : "+str(node.getState()))
+            return(score)
+        # ---------------------------------------------------------------------------------  
         target_depth = self.depth
-        target_depth=2
+        # global target_depth_reached
+        # target_depth_reached = False
         def miniMax(parent,agentIndex,current_depth):
-            print("-----------------------------------------------")
+            global target_depth_reached
             agentIndex=incrementAgentIndex(agentIndex)
-            # if parent.hasParent:
             current_depth += getDepth(agentIndex)
             if current_depth == target_depth:
                 return
-            print("agentIndex:  #"+str(agentIndex))
-            print("current_depth: -------> "+str(current_depth)+" <-------")
-            
-            
-            # print(parent)
+            # print("agentIndex:  #"+str(agentIndex))
+            # print("current_depth: -------> "+str(current_depth+1)+" <-------")
+
             parentState=parent.getState()
-            print(parentState)
-            # parentState = None
-            # if parent == None:
-                # global gameState
-                # parentState = gameState
+            # print(parentState)
   
             actions = parentState.getLegalActions(agentIndex)
             print("Possible actions for agent["+str(agentIndex)+"] are: "+str(actions))
             for action in actions:
                 childState = parentState.generateSuccessor(agentIndex, action)
-                print("action: "+str(action))
+                # print("action: "+str(action))
                 # print(childState)
-                #score = self.evaluationFunction(childState)
+                # score = self.evaluationFunction(childState)
                 # score = None
                 # print("score is: "+str(score))
                 if agentIndex == 0:
@@ -318,12 +389,21 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 else:
                     childNode = MinNode(childState,action)
                 childNode.setParent(parent)
+                
                
                 # if current_depth < target_depth:   # if current_depth < self.depth:
 
                 miniMax(childNode,agentIndex,current_depth)
+                
+                if agentIndex!=0:
+                    return
+                
+                score = giveScore(childNode,parent,agentIndex,current_depth,action)
+                # print("scoreeeeeee:"+str(score))
+                childNode.setScore(score)
+                
                 parent.addChild(childNode)
-                break
+                # break
 
         # ---------------------------------------------------------------------------------
         # gameState_=None
@@ -370,7 +450,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # printTree(root)
         
         print("----------------------------------------------------------")
-        print(counter)
+        if counter>0:
+            print("How many members does the tree have: "+str(counter))
+        
+        util.raiseNotDefined()
+        return("Stop")
         
         # if root.hasChildren():
             # for aChild in root.getChildren():
@@ -420,7 +504,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # print("Depth:   "+str(self.depth))
         
         
-        util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
