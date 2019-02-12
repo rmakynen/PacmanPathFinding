@@ -492,7 +492,58 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Get ghost states, scared timers and agent count
+    ghostStates = currentGameState.getGhostStates()
+    scaredTimers = [ghostState.scaredTimer for ghostState in ghostStates]
+    agentCount = currentGameState.getNumAgents()
+
+    # Score factors
+    baseFood = 30       # Food score factor
+    baseCapsule = 20    # Capsule score factor
+    baseGhost = 70      # Ghost score factor
+
+    # Set base score, give remaining food a weight factor as well based on score factors
+    score = currentGameState.getScore() - (baseFood + baseCapsule + baseGhost) * currentGameState.getNumFood()
+
+    # Get pacman position
+    position = currentGameState.getPacmanPosition()
+
+    # Get foods and calculate their impact on score based on distance
+    foodList = currentGameState.getFood().asList()
+    for food in foodList:
+        dist = util.manhattanDistance(position, food)
+        if dist == 0:
+            score = score
+        else:
+            score += baseFood * 1.0/dist
+
+    # Get capsules and calculate their impact on score based on distance
+    capsuleList = currentGameState.data.capsules
+    for capsule in capsuleList:
+        dist = util.manhattanDistance(position, capsule)
+        if dist == 0:
+            score = score
+        else:
+            score += baseCapsule * 1.0/dist
+
+    # Get ghosts and calculate their impact on score
+    for i in range(1,agentCount):
+        current_ghost = currentGameState.getGhostPosition(i)
+        dist = manhattanDistance(current_ghost,position)
+
+        # If scaredTimer is running ignore ghosts
+        if scaredTimers[i-1] > 3:
+            continue
+
+        # If ghost too close return negative "infinite"
+        elif dist < 2:
+            score += -sys.maxint
+
+        # Else calculate ghosts impact on score based on the distance
+        else:
+            score -= baseGhost * 1.0/dist
+
+    return score
 
 # Abbreviation
 better = betterEvaluationFunction
