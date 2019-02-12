@@ -499,7 +499,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # print("Inside \"getAction\" -------------------------------------------------------")
 
         #eval = self.evaluationFunction(gameState)
-        
+
         global agent_count
         agent_count = gameState.getNumAgents()
         ghost_count = 0
@@ -530,7 +530,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 # food_score=-1
                 # return(ghost_dist_score)
             # score = ghost_score + food_score
-        
+
             score = self.evaluationFunction(nodeState)
             # if agentIndex == 0:
                 # print("-----------------------------------------------")
@@ -540,7 +540,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 # print("My given score: "+str(score))
                 # print("My State      : "+str(node.getState()))
             return(score)
-        # ---------------------------------------------------------------------------------  
+        # ---------------------------------------------------------------------------------
         target_depth = self.depth
         def setScoreAction(best_action,best_score,new_action,new_score, agentIndex):
             if agentIndex==0:   #Max
@@ -553,7 +553,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                     return(new_action,new_score)
                 else:
                     return(best_action,best_score)
-        
+
         def miniMax(gameState,agentIndex,current_depth):
             global agent_count
             agentIndex=incrementAgentIndex(agentIndex)
@@ -600,10 +600,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
             best_action = None
             best_score = None
             action_score=[]
-            
+
             # if agentIndex != 0:
-            # current_agent 
-                
+            # current_agent
+
             for i,action in enumerate(actions):
                 successorState = gameState.generateSuccessor(agentIndex, action)
                 score = miniMax(gameState,agentIndex,current_depth)
@@ -619,10 +619,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
                     # score = scoreEvaluationFunction(successorState)
             print("Done:------------------------------------------------------------------------.")
-            
+
             def findSmallest(action_score):
                 # smallest = None
-                # smallest_val = 
+                # smallest_val =
                 smallest_unit = ["Stop",sys.maxint]
                 for anActionScore in action_score:
                     if anActionScore[1] < smallest_unit[1]:
@@ -642,16 +642,16 @@ class MinimaxAgent(MultiAgentSearchAgent):
             else:
                 return(findSmallest(action_score))
             '''
-            # current_agent 
-            
+            # current_agent
+
             # for anActionScore in action_score:
                 # print("current_depth: "+str(current_depth))
                 # print("agentIndex:    "+str(agentIndex))
                 # print("anActionScore: "+str(anActionScore))
             # print("Done:------------------------------------------------------------------------.")
-            
+
             # if agentIndex == 0:
-            
+
             # if else:
         '''
         def miniMax(parent,agentIndex,current_depth):
@@ -719,13 +719,13 @@ class MinimaxAgent(MultiAgentSearchAgent):
             # print("-----------------------------")
             # sys.exit(1)
             # parent.getBestNodeValue()
-        
+
         # ---------------------------------------------------------------------------------
         # action_ = None
         # root=MaxNode(gameState,action_)
 
         # best_node = root.getBestNode()
-        
+
         # move = miniMax(gameState,-1,-1)
         action, score  = miniMax(gameState,-1,-1)
         if action == None:
@@ -749,7 +749,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 # gameState = node.getState()
                 # if gameState != None:
                     # print(gameState)
-                    
+
         global counter
         counter=0
         def printTree(node):
@@ -777,15 +777,15 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 # print(nodeState)
 			# print(node)
             # else:
-                # print(node)    
+                # print(node)
         printTree(root)
         if counter>0:
             print("----------------------------------------------------------")
             print("How many members does the tree have: "+str(counter))
-        
+
         sys.exit(1)
         util.raiseNotDefined()
-        return("Stop")      
+        return("Stop")
         '''
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -793,101 +793,101 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       Your minimax agent with alpha-beta pruning (question 3)
     """
 
+    """
+    Returns list that contains SCORE and ACTION
+    """
+    def miniMax(self, gameState, depth, alpha, beta, agent, nodeType):
+        # Check if we have reached the end of the tree or game is already won/lost
+        if gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState), Directions.STOP
+
+        # Get the current legal actions of given agent
+        actions = gameState.getLegalActions(agent)
+        # Get last agent
+        lastAgent = gameState.getNumAgents() - 1
+        # List of best actions
+        bestActions = [Directions.STOP]
+
+        # MAX NODE
+        if nodeType == "max":
+            bestNodeScore = -sys.maxint         # Set to negative "infinite"
+
+            nextDepth = depth                   # Stay in the same depth
+            nextNodeType = "min"                # Set next node type back to MIN
+            nextAgent = 1                       # Set next agent to first ghost
+
+            # Iterate through valid actions of the current agent
+            for action in actions:
+                successorState = gameState.generateSuccessor(agent, action)
+                nodeScore = self.miniMax(successorState, nextDepth, alpha, beta, nextAgent, nextNodeType)[0]
+
+                # Always use larger number between score and alpha
+                if nodeScore > alpha:
+                    alpha = nodeScore
+
+                # Check if we have found new best MAX node with current action
+                if nodeScore > bestNodeScore:
+                    bestNodeScore = nodeScore   # Our new best score
+                    bestActions = [action]      # Set action as a single best action
+
+                elif nodeScore == bestNodeScore:
+                    bestActions.append(action)  # We have found another equally valid action
+
+                # If best node score is larger than beta break out (pruning)
+                if bestNodeScore > beta:
+                    break
+
+        # MIN NODE
+        elif nodeType == "min":
+            bestNodeScore = sys.maxint          # Set to positive "infinite"
+
+            # Check if we have not reached the last agent
+            if agent != lastAgent:
+                nextDepth = depth               # Stay in the same depth
+                nextAgent = agent + 1           # Move on to next agent (ghost)
+                nextNodeType = "min"            # Set next node type to MIN
+            else:
+                nextDepth = depth + 1           # Move down in depth level
+                nextAgent = 0                   # Move back to pacman agent
+                nextNodeType = "max"            # Set next node type back to MAX
+
+            # Iterate through valid actions of the current agent
+            for action in actions:
+                successorState = gameState.generateSuccessor(agent, action)
+                nodeScore = self.miniMax(successorState, nextDepth, alpha, beta, nextAgent, nextNodeType)[0]
+
+                # Always use smaller number between score and beta
+                if nodeScore < beta:
+                    beta = nodeScore
+
+                # Check if we have found new best MIN node with current action
+                if nodeScore < bestNodeScore:
+                    bestNodeScore = nodeScore   # Our new best score
+                    bestActions = [action]      # Set action as a single best action
+
+                if nodeScore == bestNodeScore:
+                    bestActions.append(action)  # We have found another equally valid action
+
+                # If best node score is smaller than alpha break out (pruning)
+                if bestNodeScore < alpha:
+                    break
+
+        # Return SCORE and random ACTION from bestActions-list
+        return bestNodeScore, random.choice(bestActions)
+
     def getAction(self, gameState):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        depth = self.depth * 2  # Depth of the minmax tree
+        depth = 0               # Starting depth of the minimax tree
         alpha = -sys.maxint     # MAXs best option on path to root
         beta = sys.maxint       # MINs best option on path to root
         agent = 0               # Start with Pacman
         nodeType = "max"        # Start with MAX node
 
-        """
-        Returns list that contains SCORE and ACTION
-        """
-        def miniMax(gameState, depth, alpha, beta, agent, nodeType):
-            # Check if we have reached the end of the tree or game is already won/lost
-            if depth <= 0 or gameState.isWin() or gameState.isLose():
-                return self.evaluationFunction(gameState), Directions.STOP
-
-            # Get the current legal actions of given agent
-            actions = gameState.getLegalActions(agent)
-            # Get last agent
-            lastAgent = gameState.getNumAgents() - 1
-            # List of best actions
-            bestActions = []
-
-            # MAX NODE
-            if nodeType == "max":
-                bestNodeScore = -sys.maxint         # Set to negative "infinite"
-
-                nextDepth = depth - 1               # Move down in depth level
-                nextNodeType = "min"                # Set next node type back to MIN
-                nextAgent = 1                       # Set next agent to first ghost
-
-                # Iterate through valid actions of the current agent
-                for action in actions:
-                    successorState = gameState.generateSuccessor(agent, action)
-                    nodeScore = miniMax(successorState, nextDepth, alpha, beta, nextAgent, nextNodeType)[0]
-
-                    # Always use larger number between score and alpha
-                    if nodeScore > alpha:
-                        alpha = nodeScore
-
-                    # Check if we have found new best MAX node with current action
-                    if nodeScore > bestNodeScore:
-                        bestNodeScore = nodeScore   # Our new best score
-                        bestActions = [action]      # Set action as a single best action
-
-                    elif nodeScore == bestNodeScore:
-                        bestActions.append(action)  # We have found another equally valid action
-
-                    # If best node score is larger than beta break out (pruning)
-                    if bestNodeScore > beta:
-                        break
-
-            # MIN NODE
-            elif nodeType == "min":
-                bestNodeScore = sys.maxint          # Set to positive "infinite"
-
-                # Check if we have not reached the last agent
-                if agent != lastAgent:
-                    nextDepth = depth               # Stay in the same depth
-                    nextAgent = agent + 1           # Move on to next agent (ghost)
-                    nextNodeType = "min"            # Set next node type to MIN
-                else:
-                    nextDepth = depth - 1           # Move down in depth level
-                    nextAgent = 0                   # Move back to pacman agent
-                    nextNodeType = "max"            # Set next node type back to MAX
-
-                # Iterate through valid actions of the current agent
-                for action in actions:
-                    successorState = gameState.generateSuccessor(agent, action)
-                    nodeScore = miniMax(successorState, nextDepth, alpha, beta, nextAgent, nextNodeType)[0]
-
-                    # Always use smaller number between score and beta
-                    if nodeScore < beta:
-                        beta = nodeScore
-
-                    # Check if we have found new best MIN node with current action
-                    if nodeScore < bestNodeScore:
-                        bestNodeScore = nodeScore   # Our new best score
-                        bestActions = [action]      # Set action as a single best action
-
-                    if nodeScore == bestNodeScore:
-                        bestActions.append(action)  # We have found another equally valid action
-
-                    # If best node score is smaller than alpha break out (pruning)
-                    if bestNodeScore < alpha:
-                        break
-
-            # Return SCORE and random ACTION from bestActions-list
-            return bestNodeScore, random.choice(bestActions)
-
-        # Return minimax action
-        minimaxAction = miniMax(gameState, depth, alpha, beta, agent, nodeType)[1]
+        # Return minimax actiony
+        minimaxAction = self.miniMax(gameState, depth, alpha, beta, agent, nodeType)[1]
         return minimaxAction
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
