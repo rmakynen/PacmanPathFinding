@@ -496,7 +496,7 @@ def betterEvaluationFunction(currentGameState):
         return(sys.maxint)
     elif currentGameState.isLose():
         return(-sys.maxint)
-        
+
     # Get ghost states, scared timers and agent count
     ghostStates = currentGameState.getGhostStates()
     scaredTimers = [ghostState.scaredTimer for ghostState in ghostStates]
@@ -515,7 +515,7 @@ def betterEvaluationFunction(currentGameState):
 
     walls = currentGameState.getWalls()
     distance_map = walls.copy()
-    distance_map[position[0]][position[1]] = 0 
+    distance_map[position[0]][position[1]] = 0
     # ------------------------------------------------------------------------------
     def bfs_(new_food_list):
         queue = util.Queue()
@@ -524,7 +524,7 @@ def betterEvaluationFunction(currentGameState):
         # global target_food
         # target_food=None
         cur_dist = 0
-        while not queue.isEmpty(): 
+        while not queue.isEmpty():
             x , y = queue.pop()
             cur_dist = distance_map[x][y] + 1
             if (x,y) in new_food_list:
@@ -555,18 +555,14 @@ def betterEvaluationFunction(currentGameState):
 
     foodList = currentGameState.getFood().asList()
     dist = bfs_(foodList)
-    if dist == 0:
-        score = score
-    else:
+    if not dist == 0:
         score += baseFood * 1.0/dist
 
     # Get capsules and calculate their impact on score based on distance
-    capsuleList = currentGameState.data.capsules
+    capsuleList = currentGameState.getCapsules()
     for capsule in capsuleList:
-        dist = util.manhattanDistance(position, capsule)        
-        if dist == 0:
-            score = score
-        else:
+        dist = util.manhattanDistance(position, capsule)
+        if not dist == 0:
             score += baseCapsule * 1.0/dist
 
     # Get ghosts and calculate their impact on score
