@@ -847,7 +847,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 nextAgent = agent + 1           # Move on to next agent (ghost)
                 nextNodeType = "min"            # Set next node type to MIN
             else:
-                nextDepth = depth + 1           # Move down in depth level
+                nextDepth = depth + 1           # Move to next depth level
                 nextAgent = 0                   # Move back to pacman agent
                 nextNodeType = "max"            # Set next node type back to MAX
 
@@ -895,15 +895,77 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       Your expectimax agent (question 4)
     """
 
+    """
+    Returns list that contains SCORE and ACTION
+    """
+    def expectiMax(self, gameState, depth, agent):
+        # Check if we have reached the end of the tree or game is already won/lost
+        if gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState), Directions.STOP
+
+        # Get the current legal actions of given agent
+        actions = gameState.getLegalActions(agent)
+        # Get last agent
+        lastAgent = gameState.getNumAgents() - 1
+        # List of best actions
+        bestActions = [Directions.STOP]
+
+        # PACMAN (MAX NODE)
+        if agent == 0:
+            bestNodeScore = -sys.maxint         # Set to negative "infinite"
+
+            nextDepth = depth                   # Stay in the same depth
+            nextAgent = 1                       # Set next agent to first ghost
+
+            # Iterate through valid actions of the current agent
+            for action in actions:
+                successorState = gameState.generateSuccessor(agent, action)
+                nodeScore = self.expectiMax(successorState, nextDepth, nextAgent)[0]
+
+                # Check if we have found new best MAX node with current action
+                if nodeScore > bestNodeScore:
+                    bestNodeScore = nodeScore   # Our new best score
+                    bestActions = [action]      # Set action as a single best action
+
+                elif nodeScore == bestNodeScore:
+                    bestActions.append(action)  # We have found another equally valid action
+
+        # GHOST (EXPECTIMAX NODE)
+        else:
+            bestNodeScore = 0                   # Start with 0 score
+            probability = 1.0/len(actions)      # The probability of ghost moves
+
+            # Check if we have not reached the last agent
+            if agent != lastAgent:
+                nextDepth = depth               # Stay in the same depth
+                nextAgent = agent + 1           # Move on to next agent (ghost)
+            else:
+                nextDepth = depth + 1           # Move to next depth level
+                nextAgent = 0                   # Move back to pacman agent
+
+            # Iterate through valid actions of the current agent
+            for action in actions:
+                successorState = gameState.generateSuccessor(agent, action)
+                nodeScore = self.expectiMax(successorState, nextDepth, nextAgent)[0]
+
+                # Expectimax, multiply score by probability
+                bestNodeScore += nodeScore * probability
+                bestActions = [action]          # Always return the ghost action
+
+        # Return SCORE and random ACTION from bestActions-list
+        return bestNodeScore, random.choice(bestActions)
+
     def getAction(self, gameState):
         """
-          Returns the expectimax action using self.depth and self.evaluationFunction
-
-          All ghosts should be modeled as choosing uniformly at random from their
-          legal moves.
+          Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        depth = 0               # Starting depth of the expectimax tree
+        agent = 0               # Start with Pacman
+
+        # Return expectimax action
+        expectiMaxAction = self.expectiMax(gameState, depth, agent)[1]
+        return expectiMaxAction
 
 def betterEvaluationFunction(currentGameState):
     """
