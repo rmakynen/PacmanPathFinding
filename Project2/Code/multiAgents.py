@@ -492,15 +492,20 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
+    if currentGameState.isWin():
+        return(sys.maxint)
+    elif currentGameState.isLose():
+        return(-sys.maxint)
+        
     # Get ghost states, scared timers and agent count
     ghostStates = currentGameState.getGhostStates()
     scaredTimers = [ghostState.scaredTimer for ghostState in ghostStates]
     agentCount = currentGameState.getNumAgents()
 
     # Score factors
-    baseFood = 30       # Food score factor
-    baseCapsule = 20    # Capsule score factor
-    baseGhost = 70      # Ghost score factor
+    baseFood = 20       # Food score factor  (20)
+    baseCapsule = 25    # Capsule score factor (25)
+    baseGhost = 70      # Ghost score factor (70)
 
     # Set base score, give remaining food a weight factor as well based on score factors
     score = currentGameState.getScore() - (baseFood + baseCapsule + baseGhost) * currentGameState.getNumFood()
@@ -508,19 +513,57 @@ def betterEvaluationFunction(currentGameState):
     # Get pacman position
     position = currentGameState.getPacmanPosition()
 
+    walls = currentGameState.getWalls()
+    distance_map = walls.copy()
+    distance_map[position[0]][position[1]] = 0 
+    # ------------------------------------------------------------------------------
+    def bfs_(new_food_list):
+        queue = util.Queue()
+        queue.push(position)
+        closest_food_dist = sys.maxint
+        # global target_food
+        # target_food=None
+        cur_dist = 0
+        while not queue.isEmpty(): 
+            x , y = queue.pop()
+            cur_dist = distance_map[x][y] + 1
+            if (x,y) in new_food_list:
+            # if newFood[x][y]:
+                closest_food_dist=cur_dist-1
+                if closest_food_dist < 0:
+                    closest_food_dist = 0
+                # global target_food
+                # target_food=(x,y)
+                return(closest_food_dist)
+                break;
+            directions = [(-1,0),(0,-1),(1,0),(0,1)]
+            for aDirection in directions:
+                x_ = x + aDirection[0]
+                y_ = y + aDirection[1]
+                if distance_map[x_][y_] == False and not (x_ == position[0] and y_ == position[1]) :
+                    distance_map[x_][y_] = cur_dist
+                    queue.push((x_, y_))
+    # ------------------------------------------------------------------------------
     # Get foods and calculate their impact on score based on distance
+    # foodList = currentGameState.getFood().asList()
+    # for food in foodList:
+        # dist = util.manhattanDistance(position, food)
+        # if dist == 0:
+            # score = score
+        # else:
+            # score += baseFood * 1.0/dist
+
     foodList = currentGameState.getFood().asList()
-    for food in foodList:
-        dist = util.manhattanDistance(position, food)
-        if dist == 0:
-            score = score
-        else:
-            score += baseFood * 1.0/dist
+    dist = bfs_(foodList)
+    if dist == 0:
+        score = score
+    else:
+        score += baseFood * 1.0/dist
 
     # Get capsules and calculate their impact on score based on distance
     capsuleList = currentGameState.data.capsules
     for capsule in capsuleList:
-        dist = util.manhattanDistance(position, capsule)
+        dist = util.manhattanDistance(position, capsule)        
         if dist == 0:
             score = score
         else:
@@ -530,19 +573,15 @@ def betterEvaluationFunction(currentGameState):
     for i in range(1,agentCount):
         current_ghost = currentGameState.getGhostPosition(i)
         dist = manhattanDistance(current_ghost,position)
-
         # If scaredTimer is running ignore ghosts
         if scaredTimers[i-1] > 3:
             continue
-
         # If ghost too close return negative "infinite"
         elif dist < 2:
             score += -sys.maxint
-
         # Else calculate ghosts impact on score based on the distance
         else:
-            score -= baseGhost * 1.0/dist
-
+            score -= baseGhost * 1.0/(dist)
     return score
 
 # Abbreviation
