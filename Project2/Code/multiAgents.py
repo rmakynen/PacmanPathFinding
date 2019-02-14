@@ -514,26 +514,21 @@ def betterEvaluationFunction(currentGameState):
     position = currentGameState.getPacmanPosition()
 
     walls = currentGameState.getWalls()
-    distance_map = walls.copy()
-    distance_map[position[0]][position[1]] = 0
     # ------------------------------------------------------------------------------
     def bfs_(new_food_list):
+        distance_map = walls.copy()
+        distance_map[position[0]][position[1]] = 0
         queue = util.Queue()
         queue.push(position)
         closest_food_dist = sys.maxint
-        # global target_food
-        # target_food=None
         cur_dist = 0
         while not queue.isEmpty():
             x , y = queue.pop()
             cur_dist = distance_map[x][y] + 1
             if (x,y) in new_food_list:
-            # if newFood[x][y]:
                 closest_food_dist=cur_dist-1
                 if closest_food_dist < 0:
                     closest_food_dist = 0
-                # global target_food
-                # target_food=(x,y)
                 return(closest_food_dist)
                 break;
             directions = [(-1,0),(0,-1),(1,0),(0,1)]
@@ -555,16 +550,15 @@ def betterEvaluationFunction(currentGameState):
 
     foodList = currentGameState.getFood().asList()
     dist = bfs_(foodList)
-    if not dist == 0:
-        score += baseFood * 1.0/dist
+    if dist != 0:
+        score += (baseFood * 1.0/dist)
 
     # Get capsules and calculate their impact on score based on distance
     capsuleList = currentGameState.getCapsules()
     for capsule in capsuleList:
         dist = util.manhattanDistance(position, capsule)
-        if not dist == 0:
-            score += baseCapsule * 1.0/dist
-
+        if dist != 0:
+            score += (baseCapsule * 1.0/dist)
     # Get ghosts and calculate their impact on score
     for i in range(1,agentCount):
         current_ghost = currentGameState.getGhostPosition(i)
@@ -577,7 +571,7 @@ def betterEvaluationFunction(currentGameState):
             score += -sys.maxint
         # Else calculate ghosts impact on score based on the distance
         else:
-            score -= baseGhost * 1.0/(dist)
+            score -= (baseGhost * 1.0/dist)
     return score
 
 # Abbreviation
