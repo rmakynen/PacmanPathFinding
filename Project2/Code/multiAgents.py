@@ -428,7 +428,13 @@ def betterEvaluationFunction(currentGameState):
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 5).
 
-      DESCRIPTION: <write something here so we know what you did>
+      DESCRIPTION:
+	  
+	  Initial version was copied from Q1 solution.
+	  - Different weight values were given for each object: Food, Capsule and Ghost. These parameters can be adjusted in order to shift the importance of each object.
+	    We arrived at values 20,25,70 by testing numerous times.
+	  - The score algorithm 
+	  
     """
     "*** YOUR CODE HERE ***"
     if currentGameState.isWin():
@@ -447,7 +453,8 @@ def betterEvaluationFunction(currentGameState):
     baseGhost = 70      # Ghost score factor (70)
 
     # Set base score, give remaining food a weight factor as well based on score factors
-    score = currentGameState.getScore() - (baseFood + baseCapsule + baseGhost) * currentGameState.getNumFood()
+    #score = currentGameState.getScore() - (baseFood + baseCapsule + baseGhost) * currentGameState.getNumFood()
+    score = currentGameState.getScore() - (100)* currentGameState.getNumFood()
 
     # Get pacman position
     position = currentGameState.getPacmanPosition()
