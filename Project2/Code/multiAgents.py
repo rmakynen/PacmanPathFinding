@@ -431,10 +431,27 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION:
 	  
 	  Initial version was copied from Q1 solution.
-	  - Different weight values were given for each object: Food, Capsule and Ghost. These parameters can be adjusted in order to shift the importance of each object.
+	  - Different weight values were given for each object: Food, Capsule and Ghost.
+	    These parameters can be adjusted in order to shift the importance of each entity.
 	    We arrived at values 20,25,70 by testing numerous times.
-	  - The score algorithm 
-	  
+	  - The score algorithm has this kind of structure:
+		score = base + food_score + ghost_score + capsule_score
+	  - base is the initial value we set the score as. It consists of the score of the current
+	    state of the game from which we subtract 100 * the amount of food left. 
+	    This means that we penalize gamestates that have more food left in them.
+	  - food_score is simply +(baseFood * 1.0/dist), where baseFood is the weight (read importance)
+	    we gave to our food. dist is the exact distance to the closest food.
+	  - ghost_score is either zero or negative. It's zero, when the ghost is scared. Ghost score is
+	    minus infinity when ghost distance is 1 or less and if this happens then return minus infinity
+		for that gamestate. When distance is 2 or greater then the ghost_score is -(baseGhost * 1.0/dist).
+		Here distance is manhattanDistance to the ghost.
+		In other words we avoid ghosts when they are not scared, and when they are scared then we ignore
+		them for the most part.
+	  - Capsules allow us to eat ghosts to gain more points. The capsule_score is calculate by: +(baseCapsule * 1.0/dist)
+	    where baseCapsule is the weight value we gave to our capsules. Distance is the manhattanDistance to a capsule.
+	  - We didn't notice any benefits from using exact distance in other than the food_score, which means that manhattanDistance
+	    is used in most occasions.
+      - At the end we return the "score" variable.
     """
     "*** YOUR CODE HERE ***"
     if currentGameState.isWin():
@@ -453,12 +470,10 @@ def betterEvaluationFunction(currentGameState):
     baseGhost = 70      # Ghost score factor (70)
 
     # Set base score, give remaining food a weight factor as well based on score factors
-    #score = currentGameState.getScore() - (baseFood + baseCapsule + baseGhost) * currentGameState.getNumFood()
     score = currentGameState.getScore() - (100)* currentGameState.getNumFood()
 
     # Get pacman position
     position = currentGameState.getPacmanPosition()
-
     walls = currentGameState.getWalls()
     # ------------------------------------------------------------------------------
     def bfs_(new_food_list):
