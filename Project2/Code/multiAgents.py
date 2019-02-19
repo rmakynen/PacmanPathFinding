@@ -63,6 +63,16 @@ class ReflexAgent(Agent):
 
         Print out these variables to see what you're getting, then combine them
         to create a masterful evaluation function.
+		
+		Our Masterful evaluation function:
+		- Ghosts are checked first, then stop action then food score.
+		- If distance to ghost is one then return a very small score for that state to indicate danger.
+		- If we ate a pellet then we ignore ghosts if they are scared.
+		- If our action is stop, then return 0 to indicate that we won't get any points by staying still.
+		- Food score consists of 2 separate values. First we see difference between the old state and the new state.
+		  If the new state has less food left then we know we just are a food and we add 120 points to the score.
+		  After this we calculate closest distance to the food and add more score if the location is close to this new food.
+		- At the end we return the food score.
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
